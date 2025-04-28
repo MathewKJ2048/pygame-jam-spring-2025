@@ -1,4 +1,6 @@
 from conf import *
+from builder import *
+
 
 class Game:
 	def __init__(self):
@@ -7,7 +9,12 @@ class Game:
 		self.objects = []
 		self.debug_transcript = {}
 		self.running = True
-	def update(self,dt):
+		self.camera = Vector2(0,0)
+		self.scale = 1
+		self.builder = Builder()
+
+	def evolve(self,dt):
+		self.builder.evolve(dt)
 		pass
 	def log(self,key,value):
 		self.debug_transcript[key] = value

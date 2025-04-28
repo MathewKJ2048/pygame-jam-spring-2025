@@ -19,9 +19,19 @@ def play():
 				game.exit()
 			
 		pressed_keys = pygame.key.get_pressed()
+		game.builder.v = Vector2(0,0)
+		if pressed_keys[pygame.K_LEFT]:
+			game.builder.v+=Vector2(1,0)
+		if pressed_keys[pygame.K_RIGHT]:
+			game.builder.v+=Vector2(-1,0)
+		if pressed_keys[pygame.K_UP]:
+			game.builder.v+=Vector2(0,1)
+		if pressed_keys[pygame.K_DOWN]:
+			game.builder.v+=Vector2(0,-1)
+		game.log("r",str(game.builder.r))
 
 		game.log("framerate:",round(1/dt))
-		game.update(dt)
+		game.evolve(dt)
 		screen.blit(render(game),(0,0))
 		pygame.display.flip()
 		if DEBUG:
