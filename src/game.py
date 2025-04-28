@@ -1,5 +1,6 @@
 from conf import *
 from builder import *
+from space import *
 
 
 class Game:
@@ -15,10 +16,26 @@ class Game:
 
 	def evolve(self,dt):
 		self.builder.evolve(dt)
+		self.init_space_at_builder()
 		pass
 	def log(self,key,value):
 		self.debug_transcript[key] = value
 	def exit(self):
 		self.running = False
+
+	def builder_in_space(self):
+		for s in self.spaces:
+			if s.contains(self.builder):
+				return True
+		return False
+	def init_space_at_builder(self):
+		if self.builder_in_space():
+			return False
+		r = self.builder.r
+		r_ = Vector2(round(r.x),round(r.y))
+		space = Space()
+		space.r = r_
+		self.spaces.append(space)
+
 
 	
