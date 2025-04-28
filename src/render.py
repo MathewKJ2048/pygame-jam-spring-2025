@@ -11,9 +11,14 @@ def render_space(surface,s):
 	screen_points = [project(r+n*s.size,game.scale) for n in neighbours]
 	pygame.draw.polygon(surface,(100,100,100),screen_points)
 
+def render_object(surface,o):
+	r = o.r
+	pygame.draw.aacircle(surface,(100,100,100),project(r),1/2)
+
 def render(game):
 	surface = pygame.Surface((WIDTH,HEIGHT))
 	surface.fill(BACKGROUND)
 	for s in game.spaces:
 		render_space(surface,s)
+	render_object(surface, game.player)
 	return surface
