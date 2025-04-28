@@ -1,1 +1,1 @@
-from conf import *
+BACKGROUND = (0,0,0)
