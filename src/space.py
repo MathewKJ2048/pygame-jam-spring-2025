@@ -4,6 +4,7 @@ from object import *
 class Space(GameObject):
 	def __init__(self,parent=None):
 		super().__init__()
+		self.children = []
 		if parent:
 			self.parent = parent
 			self.level = parent.level+1
@@ -25,8 +26,7 @@ class Space(GameObject):
 		for i in range(N):
 			for j in range(N):
 				ct+=1
-				s = Space()
-				s.size = new_size
+				s = Space(parent=self)
 				s.r = self.r - (I+J)*self.size/2 + (I+J)*new_size/2 + i*I*new_size + j*J*new_size
 				self.children.append(s)
 		assert ct == SUBDIVISION*SUBDIVISION

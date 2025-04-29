@@ -15,6 +15,7 @@ class Game:
 
 	def evolve(self,dt):
 		self.builder.evolve(dt)
+		self.builder.parent = self.get_current_space()
 		self.init_space_at_builder()
 		pass
 	def exit(self):
