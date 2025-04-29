@@ -3,14 +3,11 @@ from object import *
 
 class Space(GameObject):
 	def __init__(self,parent=None):
-		super().__init__()
+		super().__init__(parent=parent)
 		self.children = []
 		if parent:
-			self.parent = parent
-			self.level = parent.level+1
 			self.size = self.parent.size/SUBDIVISION
 		else:
-			self.level = 0
 			self.size = 1
 	def contains(self,o):
 		diff_x = abs(self.r.x - o.r.x)
