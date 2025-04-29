@@ -8,7 +8,6 @@ class Game:
 		self.time = 0
 		self.spaces = []
 		self.objects = []
-		self.debug_transcript = {}
 		self.running = True
 		self.camera = Vector2(0,0)
 		self.scale = 1
@@ -18,10 +17,29 @@ class Game:
 		self.builder.evolve(dt)
 		self.init_space_at_builder()
 		pass
-	def log(self,key,value):
-		self.debug_transcript[key] = value
 	def exit(self):
 		self.running = False
+
+
+	def get_current_space(self):
+		level = -1
+		space = None
+		for s in self.spaces:
+			if s.contains(self.builder) and s.level > level:
+				space = s
+				level = s.level
+		return space
+
+
+	def expand(self):
+		
+		space = self.get_current_space()
+		if not space:
+			return
+		space.subdivide()
+		for c in space.children:
+			self.spaces.append(c)
+		
 
 	def builder_in_space(self):
 		for s in self.spaces:
