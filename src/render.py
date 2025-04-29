@@ -8,7 +8,7 @@ def project(r,game):
 def render_space(surface,s,game,color_override = None):
 	r = s.r
 	neighbours = [Vector2(1/2,1/2),Vector2(1/2,-1/2),Vector2(-1/2,-1/2),Vector2(-1/2,1/2)]
-	screen_points = [project(r+n*s.size,game) for n in neighbours]
+	screen_points = [project(r+n*s.size(),game) for n in neighbours]
 	color = MAGENTA
 	if s.level % 2 == 1:
 		color = CYAN

@@ -9,3 +9,5 @@ class GameObject:
 		else:
 			self.parent = None
 			self.level = 0
+	def size(self):
+		return SUBDIVISION**(-self.level)

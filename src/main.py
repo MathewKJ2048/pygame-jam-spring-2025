@@ -26,9 +26,9 @@ def play():
 		pressed_keys = pygame.key.get_pressed()
 		game.builder.v = Vector2(0,0)
 		if pressed_keys[pygame.K_LEFT]:
-			game.builder.v+=Vector2(1,0)
-		if pressed_keys[pygame.K_RIGHT]:
 			game.builder.v+=Vector2(-1,0)
+		if pressed_keys[pygame.K_RIGHT]:
+			game.builder.v+=Vector2(1,0)
 		if pressed_keys[pygame.K_UP]:
 			game.builder.v+=Vector2(0,1)
 		if pressed_keys[pygame.K_DOWN]:
