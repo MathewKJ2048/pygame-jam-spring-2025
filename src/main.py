@@ -28,6 +28,8 @@ def play():
 					game.place_engine()
 				if event.key == pygame.K_t:
 					game.place_tower()
+				if event.key == pygame.K_h:
+					game.place_high_tower()
 			
 		pressed_keys = pygame.key.get_pressed()
 		game.builder.v = Vector2(0,0)

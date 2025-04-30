@@ -92,14 +92,50 @@ class Game:
 	def place_engine(self):
 		e = Engine()
 		self.place_object(e)
+		self.make_connection(e)
 
 	def place_tower(self):
 		t = Tower()
 		self.place_object(t)
-		for o in self.objects:
-			if isinstance(o,PoweredObject):
-				t.connect(o)
+		self.make_connection(t)
+
+	def place_high_tower(self):
+		t = HighTower()
+		self.place_object(t)
+		self.make_connection(t)
 		
+	def make_connection(self,t):
+		# connection policy:
+		# find all within range
+		# then find the one with the largest number of open connections
+		# then connect to it
+		# nonononononononononononononono
+		# get all suitable
+		# use network logic to form equivalence classes
+		# in each equivalence class, pick the ones with the most open connections
+		# of them, pick the ones which are closest
+		suitable = []
+		for o in self.objects:
+			if not isinstance(o,PoweredObject) or o==t:
+				continue
+			if not t.is_connectable(o):
+				continue
+			suitable.append(o)
+
+		networks = []
+		for s in suitable:
+			redundant = False
+			for n in networks:
+				if s in n:
+					redundant = True
+			if not redundant:
+				networks.append([t for t in s.get_network_objects() if t in suitable]) # subset of suitable objects in network
+
+		networks.sort(key=lambda t: -len(t)) # sort networks by size
+		for n in networks:
+			n.sort(key=lambda o: -len(o.get_free_ports())) # sort individual elements by connectivity
+		for n in networks:
+			t.connect(n[0]) # attempt to connect to each network, from largest to smallest
 
 	def builder_in_space(self):
 		for s in self.spaces:
