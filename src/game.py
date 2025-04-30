@@ -21,7 +21,8 @@ class Game:
 		self.builder.evolve(dt)
 		self.builder.set_parent(self.get_current_space())
 		self.init_space_at_builder()
-		self.camera_level = self.builder.level-1
+		target = self.builder.level-1
+		self.camera_level += (target-self.camera_level)*dt
 		self.camera = self.builder.r.copy()
 		log("game level",self.camera_level)
 
