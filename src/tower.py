@@ -1,8 +1,8 @@
 from conf import *
 from object import *
 
-class Tower(PlacedObject):
-	PORT_NUM = 8
+class Tower(PoweredObject):
+	PORT_NUM = 6
 	RANGE = 2
 	def get_lines(self):
 		tower_base = K3/8

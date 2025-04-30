@@ -11,7 +11,7 @@ class Bug(PlacedObject):
 		self.v = I
 		self.time = 0
 		self.target = None
-		self.color = YELLOW
+		self.color = (200,100,0)
 		self.compute_geometry()
 		
 	
@@ -38,6 +38,8 @@ class Bug(PlacedObject):
 		self.steps(dt)
 	def get_color(self):
 		return self.color
+	def get_width(self):
+		return 4
 	def legs_slide_back(self,dt):
 		change = Vector3(*self.v*dt,0)
 		self.leg_positions_relative = [r - change for r in self.leg_positions_relative]
@@ -104,5 +106,5 @@ class Bug(PlacedObject):
 			t = ankles[i]
 			feet+=[(t,t+unit_vector3(i*2*math.pi/3)/6) for i in range(3)]
 	
-		return make_pair_list(self.BASE)+make_pair_list(self.TOP)+forward_connections+backward_connections+upper+lower+thighs+calves+feet+make_pair_list(self.target_leg_positions)
+		return make_pair_list(self.BASE)+make_pair_list(self.TOP)+forward_connections+backward_connections+upper+lower+thighs+calves+feet
 		

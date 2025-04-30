@@ -29,8 +29,8 @@ class Port:
 		self.parent = parent
 		self.r = r # position of port relative to parent
 		self.connection = None # reference to connected port
-	def get_r():
-		return self.parent.r+self.r*self.parent.size()
+	def get_r(self):
+		return Vector3(*self.parent.r,0)+self.r*self.parent.size()
 	def is_free(self):
 		return self.connection == None
 	def connect(self,p):
@@ -47,16 +47,23 @@ class PoweredObject(PlacedObject):
 	RANGE = 1
 	def __init__(self):
 		super().__init__()
-		self.PORTS = [Port(Vector3(0,0,0)) for i in range(type(self).PORT_NUM)]
+		self.PORTS = [Port(self,Vector3(0,0,0)) for i in range(type(self).PORT_NUM)]
 	
 	def get_connected_objects(self):
-		return [p.connection.parent for p in self.PORTS]
+		return [p.connection.parent for p in self.get_connected_ports()]
+
+	def get_connected_ports(self):
+		cp = []
+		for p in self.PORTS:
+			if not p.is_free():
+				cp.append(p)
+		return cp
 
 	def get_free_ports(self):
 		fp = []
-		for p in self.ports:
+		for p in self.PORTS:
 			if p.is_free():
-				fp.append(c)
+				fp.append(p)
 		return fp
 
 	def connect(self,o):
@@ -70,7 +77,9 @@ class PoweredObject(PlacedObject):
 			p1, p2 = pp
 			return (p1.get_r()-p2.get_r()).length()
 		# sort pairs of free ports by distance, extract closest pair
-		po, ps = [(pu,pv) for pu in fp_s for pv in fp_o].sort(key=key)[0]
+		list_pair_ports = [(pu,pv) for pu in fp_s for pv in fp_o]
+		list_pair_ports.sort(key=key)
+		po, ps = list_pair_ports[0]
 		if (po.get_r()-ps.get_r()).length() > max(type(self).RANGE,type(o).RANGE):
 			return False
 		po.connect(ps)

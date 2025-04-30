@@ -96,6 +96,9 @@ class Game:
 	def place_tower(self):
 		t = Tower()
 		self.place_object(t)
+		for o in self.objects:
+			if isinstance(o,PoweredObject):
+				t.connect(o)
 		
 
 	def builder_in_space(self):

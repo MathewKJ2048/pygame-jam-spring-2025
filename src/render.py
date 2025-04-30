@@ -1,4 +1,5 @@
 from conf import *
+from game import *
 
 def clip(x,m): # between 0 and m
 	x = max(x,0)
@@ -38,11 +39,6 @@ def draw_line(surface,pp,color,width):
 	if pp:
 		pygame.draw.aaline(surface,color,pp[0],pp[1],width=width)
 	
-
-
-	
-
-
 
 def project(r,game):
 	x = r.x
@@ -93,6 +89,15 @@ def render_selection_plate(surface,b,game):
 	points = [project3(Vector3(s.r.x,s.r.y,0)+t[0]*s.size()*3/4,game) for t in s.get_lines()]
 	pygame.draw.polygon(surface,WHITE,points,width=2)
 
+def render_wires(surface,object_list,game):
+	for o in object_list:
+		if not isinstance(o,PoweredObject):
+			continue
+		for p in o.PORTS:
+			if p.is_free():
+				continue
+			pp = (project3(p.get_r(),game),project3(p.connection.get_r(),game))
+			draw_line(surface,pp,YELLOW,2)
 
 
 
@@ -123,5 +128,6 @@ def render(game):
 	for o in objects:
 		render_object(surface, o, game)
 	render_selection_plate(surface,game.builder,game)
+	render_wires(surface,game.objects,game)
 	render_builder(surface, game.builder, game)
 	return surface
