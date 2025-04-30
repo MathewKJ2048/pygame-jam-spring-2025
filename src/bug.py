@@ -58,8 +58,6 @@ class Bug(PlacedObject):
 			opp = (i+self.N//2)%self.N
 			L = (self.BASE[i] - self.leg_positions_relative[i]).length()
 			alright = 1.1*L<self.L1+self.L2
-			assert type(alright)==bool
-			log("alright"+str(i),str(alright))
 			if (nb1 not in movement and nb2 not in movement and opp not in movement) or not alright:
 				movement.append(i)
 		return movement

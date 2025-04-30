@@ -2,6 +2,8 @@ from conf import *
 from builder import *
 from space import *
 from bug import *
+from engine import *
+from tower import *
 
 
 class Game:
@@ -14,6 +16,7 @@ class Game:
 		self.camera_angle = math.pi/6
 		self.camera_level = 0
 		self.builder = Builder()
+		self.particles = []
 	
 	def scale(self):
 		return SUBDIVISION**(self.camera_level)
@@ -25,14 +28,23 @@ class Game:
 		self.init_space_at_builder()
 
 		for o in self.objects:
-			o.evolve(dt)
+			if type(o) in [Bug]:
+				o.evolve(dt)
 			if type(o)==Bug:
 				o.set_parent(self.get_current_space(o))
 		
 		target = self.builder.level-1
 		self.camera_level = lerp_approach(self.camera_level,target,abs(self.camera_level-target),dt)
 		self.camera = self.builder.r.copy()
-		log("game level",self.camera_level)
+
+		num_types = {}
+		for o in self.objects:
+			key = str(type(o))
+			if key in num_types:
+				num_types[key]+=1
+			else:
+				num_types[key]=1
+		log("object-readout",str(num_types))
 
 	def exit(self):
 		self.running = False
@@ -53,19 +65,37 @@ class Game:
 		space = self.get_current_space(self.builder)
 		if not space:
 			return
+		if not space.is_free():
+			return
 		space.subdivide()
 		for c in space.children:
 			self.spaces.append(c)
 
-	def place_bug(self):
+	def place_object(self,o):
 		space = self.get_current_space(self.builder)
 		if not space:
-			return
+			return False
+		if not space.is_free():
+			return False
+		o.r = space.r.copy()
+		o.set_parent(space)
+		space.children.append(o)
+		self.objects.append(o)
+		return True
+
+	def place_bug(self):
 		b = Bug()
-		b.r = self.builder.r.copy()
-		b.set_parent(space)
-		b.target = self.builder
-		self.objects.append(b)
+		if self.place_object(b):
+			b.target = self.builder
+
+
+	def place_engine(self):
+		e = Engine()
+		self.place_object(e)
+
+	def place_tower(self):
+		t = Tower()
+		self.place_object(t)
 		
 
 	def builder_in_space(self):

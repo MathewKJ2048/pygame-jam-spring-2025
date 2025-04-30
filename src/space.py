@@ -34,3 +34,9 @@ class Space(GameObject):
 				s.r = self.r - (I+J)*self.size()/2 + (I+J)*new_size/2 + i*I*new_size + j*J*new_size
 				self.children.append(s)
 		return True
+
+	def is_free(self):
+		for c in self.children:
+			if type(c)!=Space:
+				return False
+		return True

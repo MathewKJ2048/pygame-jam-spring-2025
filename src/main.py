@@ -24,6 +24,10 @@ def play():
 					game.expand()
 				if event.key == pygame.K_b:
 					game.place_bug()
+				if event.key == pygame.K_e:
+					game.place_engine()
+				if event.key == pygame.K_t:
+					game.place_tower()
 			
 		pressed_keys = pygame.key.get_pressed()
 		game.builder.v = Vector2(0,0)
@@ -38,8 +42,7 @@ def play():
 		if game.builder.v.length() > 0:
 			game.builder.v = game.builder.v.normalize()
 		game.builder.v*=VELOCITY
-		log("r",str(game.builder.r))
-		log("number of children",len(game.spaces))
+		log("number of spaces",len(game.spaces))
 
 		log("framerate:",round(1/dt))
 		game.evolve(dt)
