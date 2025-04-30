@@ -1,6 +1,7 @@
 from conf import *
 from builder import *
 from space import *
+from bug import *
 
 
 class Game:
@@ -18,11 +19,18 @@ class Game:
 		return SUBDIVISION**(self.camera_level)
 
 	def evolve(self,dt):
+
 		self.builder.evolve(dt)
-		self.builder.set_parent(self.get_current_space())
+		self.builder.set_parent(self.get_current_space(self.builder))
 		self.init_space_at_builder()
+
+		for o in self.objects:
+			o.evolve(dt)
+			if type(o)==Bug:
+				o.set_parent(self.get_current_space(o))
+		
 		target = self.builder.level-1
-		self.camera_level += (target-self.camera_level)*dt
+		self.camera_level = lerp_approach(self.camera_level,target,abs(self.camera_level-target),dt)
 		self.camera = self.builder.r.copy()
 		log("game level",self.camera_level)
 
@@ -30,11 +38,11 @@ class Game:
 		self.running = False
 
 
-	def get_current_space(self):
+	def get_current_space(self,o):
 		level = -1
 		space = None
 		for s in self.spaces:
-			if s.contains(self.builder) and s.level > level:
+			if s.contains(o) and s.level > level:
 				space = s
 				level = s.level
 		return space
@@ -42,12 +50,22 @@ class Game:
 
 	def expand(self):
 		
-		space = self.get_current_space()
+		space = self.get_current_space(self.builder)
 		if not space:
 			return
 		space.subdivide()
 		for c in space.children:
 			self.spaces.append(c)
+
+	def place_bug(self):
+		space = self.get_current_space(self.builder)
+		if not space:
+			return
+		b = Bug()
+		b.r = self.builder.r.copy()
+		b.set_parent(space)
+		b.target = self.builder
+		self.objects.append(b)
 		
 
 	def builder_in_space(self):

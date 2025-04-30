@@ -97,17 +97,17 @@ def render_selection_plate(surface,b,game):
 
 def render(game):
 	surface = pygame.Surface((WIDTH,HEIGHT))
-	surface.fill(darken(MAGENTA,0.2))
+	surface.fill(BACKGROUND)
 
 	def filter_list_objects(lobj):
 		filtered = []
 		for o in lobj:
-			if o.level <= game.camera_level+2:
+			if o.level <= game.camera_level+3:
 				filtered.append(o)
 		return filtered
 
 	spaces = filter_list_objects(game.spaces)
-	
+	objects = filter_list_objects(game.objects)
 
 	def key(s):
 		return s.level
@@ -118,6 +118,8 @@ def render(game):
 	
 	for s in spaces:
 		render_object(surface,s,game)
+	for o in objects:
+		render_object(surface, o, game)
 	render_selection_plate(surface,game.builder,game)
 	render_builder(surface, game.builder, game)
 	return surface

@@ -22,6 +22,8 @@ def play():
 				if event.key == pygame.K_s:
 					log("press")
 					game.expand()
+				if event.key == pygame.K_b:
+					game.place_bug()
 			
 		pressed_keys = pygame.key.get_pressed()
 		game.builder.v = Vector2(0,0)

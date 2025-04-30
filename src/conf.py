@@ -27,14 +27,15 @@ DEBUG = True
 WIDTH = 1200
 HEIGHT = 800
 
-ERROR_X = WIDTH/10
-ERROR_Y = HEIGHT/10
+ERROR_X = WIDTH
+ERROR_Y = HEIGHT
 XMIN = -ERROR_X
 YMIN = -ERROR_Y
 XMAX = WIDTH+ERROR_X
 YMAX = HEIGHT+ERROR_Y
 
 BUILDER_ANGULAR_VELOCITY = 1
+GAIT = 0.5
 
 SUBDIVISION = 5
 
@@ -60,3 +61,10 @@ def make_pair_list(base_list):
 	for i in range(len(base_list)):
 		pair_list.append((base_list[i],base_list[(i+1)%len(base_list)]))
 	return pair_list
+
+def lerp_approach(current,target,rate,dt): # returns new target
+	change = rate*dt
+	diff =  (target-current)
+	if abs(diff)<=change:
+		return target
+	return current + (change*diff/abs(diff))
