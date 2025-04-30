@@ -11,14 +11,20 @@ class Game:
 		self.running = True
 		self.camera = Vector2(0,0)
 		self.camera_angle = math.pi/6
-		self.scale = 1
+		self.camera_level = 0
 		self.builder = Builder()
+	
+	def scale(self):
+		return SUBDIVISION**(self.camera_level)
 
 	def evolve(self,dt):
 		self.builder.evolve(dt)
 		self.builder.set_parent(self.get_current_space())
 		self.init_space_at_builder()
-		pass
+		self.camera_level = self.builder.level-1
+		self.camera = self.builder.r.copy()
+		log("game level",self.camera_level)
+
 	def exit(self):
 		self.running = False
 
