@@ -2,13 +2,13 @@ from conf import *
 from object import *
 
 class Tower(PlacedObject):
-	MAX_CONNECTIONS = 8
+	PORT_NUM = 8
 	RANGE = 2
 	def get_lines(self):
 		tower_base = K3/8
 		tower_top = K3/2
 
-		n = Tower.MAX_CONNECTIONS
+		n = Tower.PORT_NUM
 		base = [unit_vector3(i*2*math.pi/n) for i in range(n)]
 		pedestal_low = [b/4 for b in base]
 		pedestal_high = [b/4+tower_base for b in base]
@@ -20,6 +20,6 @@ class Tower(PlacedObject):
 		pass
 
 class HighTower(PlacedObject):
-	MAX_CONNECTIONS = 3
+	PORT_NUM = 3
 	RANGE = 8
 	pass

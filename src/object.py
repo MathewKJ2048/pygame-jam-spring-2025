@@ -44,6 +44,7 @@ class Port:
 
 class PoweredObject(PlacedObject):
 	PORT_NUM = 4
+	RANGE = 1
 	def __init__(self):
 		super().__init__()
 		self.PORTS = [Port(Vector3(0,0,0)) for i in range(type(self).PORT_NUM)]
@@ -70,6 +71,8 @@ class PoweredObject(PlacedObject):
 			return (p1.get_r()-p2.get_r()).length()
 		# sort pairs of free ports by distance, extract closest pair
 		po, ps = [(pu,pv) for pu in fp_s for pv in fp_o].sort(key=key)[0]
+		if (po.get_r()-ps.get_r()).length() > max(type(self).RANGE,type(o).RANGE):
+			return False
 		po.connect(ps)
 		return True
 	
