@@ -1,6 +1,7 @@
 from conf import *
 
 class GameObject:
+	color = WHITE
 	def __init__(self,parent=None):
 		self.r = Vector2(0,0)
 		self.set_parent(parent)

@@ -29,7 +29,7 @@ def render_space(surface,s,game,color_override = None):
 def render_object(surface,o,game):
 	r = Vector3(o.r.x,o.r.y,0)
 	size = CAMERA_CONSTANT_SCALE/2 * game.scale * o.size()
-	pygame.draw.aacircle(surface,(100,100,100),project3(r,game),size)
+	pygame.draw.aacircle(surface,type(o).color,project3(r,game),size)
 
 def render_builder(surface,b,game):
 	render_object(surface, game.builder, game)
