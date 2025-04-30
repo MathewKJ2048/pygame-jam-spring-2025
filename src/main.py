@@ -26,13 +26,16 @@ def play():
 		pressed_keys = pygame.key.get_pressed()
 		game.builder.v = Vector2(0,0)
 		if pressed_keys[pygame.K_LEFT]:
-			game.builder.v+=-I*VELOCITY
+			game.builder.v+=-I
 		if pressed_keys[pygame.K_RIGHT]:
-			game.builder.v+=I*VELOCITY
+			game.builder.v+=I
 		if pressed_keys[pygame.K_UP]:
-			game.builder.v+=J*VELOCITY
+			game.builder.v+=J
 		if pressed_keys[pygame.K_DOWN]:
-			game.builder.v+=-J*VELOCITY
+			game.builder.v+=-J
+		if game.builder.v.length() > 0:
+			game.builder.v = game.builder.v.normalize()
+		game.builder.v*=VELOCITY
 		log("r",str(game.builder.r))
 		log("number of children",len(game.spaces))
 
