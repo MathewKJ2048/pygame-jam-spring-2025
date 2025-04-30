@@ -13,35 +13,40 @@ def project3(r,game):
 	K_transform = unit_vector(math.pi/2)
 	v = r.x*I_transform + r.y*J_transform + r.z*K_transform
 	return project(v,game)
-	
 
-def render_space(surface,s,game,color_override = None):
-	r = Vector3(s.r.x,s.r.y,0)
-	neighbours = [Vector3(1/2,1/2,0),Vector3(1/2,-1/2,0),Vector3(-1/2,-1/2,0),Vector3(-1/2,1/2,0)]
-	screen_points = [project3(r+n*s.size(),game) for n in neighbours]
-	color = MAGENTA
-	if s.level % 2 == 1:
-		color = CYAN
-	if color_override:
-		color = color_override
-	pygame.draw.polygon(surface,color,screen_points,width=1)
 
 def render_object(surface,o,game):
-	r = Vector3(o.r.x,o.r.y,0)
-	size = CAMERA_CONSTANT_SCALE/2 * game.scale * o.size()
-	pygame.draw.aacircle(surface,type(o).color,project3(r,game),size)
+	r0 = Vector3(o.r.x,o.r.y,0)
+	pairs = o.get_lines()
+	def transform(r):
+		return project3(r0 + r*o.size(),game)
+	def transform_pair(p):
+		u, v = p
+		return (transform(u),transform(v))
+	point_pairs = [transform_pair(l) for l in pairs]
+	for pp in point_pairs:
+		pygame.draw.aaline(surface,o.get_color(),pp[0],pp[1],width=o.get_width())
+
+def render_surface_base(surface,s,game):
+	points = [project3(Vector3(s.r.x,s.r.y,0)+t[0]*s.size(),game) for t in s.get_lines()]
+	pygame.draw.polygon(surface,darken(s.get_color(),0.5),points)
+
+def render_space(surface,s,game):
+	render_object(surface,s,game)
+	
 
 def render_builder(surface,b,game):
 	render_object(surface, game.builder, game)
-	if b.parent:
-		render_space(surface, b.parent, game, color_override=WHITE)
+
 
 def render(game):
 	surface = pygame.Surface((WIDTH,HEIGHT))
 	surface.fill(BACKGROUND)
 	def key(s):
-		return -s.level
+		return s.level
 	game.spaces.sort(key=key)
+	for s in game.spaces:
+		render_surface_base(surface,s,game)
 	for s in game.spaces:
 		render_space(surface,s,game)
 	render_builder(surface, game.builder, game)

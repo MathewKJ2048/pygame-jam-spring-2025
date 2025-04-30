@@ -5,6 +5,19 @@ class Space(GameObject):
 	def __init__(self,parent=None):
 		super().__init__(parent=parent)
 		self.children = []
+
+	def get_lines(self):
+		return make_pair_list([
+			(I3+J3)/2,
+			(I3-J3)/2,
+			(-I3-J3)/2,
+			(-I3+J3)/2
+		])
+
+	def get_color(self):
+		if self.level%2 == 0:
+			return MAGENTA
+		return CYAN
 	
 	def contains(self,o):
 		diff_x = abs(self.r.x - o.r.x)
