@@ -35,7 +35,7 @@ XMAX = WIDTH+ERROR_X
 YMAX = HEIGHT+ERROR_Y
 
 BUILDER_ANGULAR_VELOCITY = 1
-GAIT = 0.5
+GAIT = 0.4
 
 SUBDIVISION = 5
 
@@ -65,6 +65,32 @@ def make_pair_list(base_list):
 def lerp_approach(current,target,rate,dt): # returns new target
 	change = rate*dt
 	diff =  (target-current)
-	if abs(diff)<=change:
+	log("diff_type",type(diff))
+	if type(diff) in [float,int]:
+		print(type(diff))
+		diff_mag = abs(diff)
+	else:
+		diff_mag = diff.length()
+	if diff_mag<=change:
 		return target
-	return current + (change*diff/abs(diff))
+	return current + (change*diff/diff_mag)
+
+
+def solve(L1,L2,P,O):
+	P = P-O
+	RAD = Vector3(P.x,P.y,0)
+	AZ = Vector3(0,0,P.z)
+	x0, y0 = RAD.length(), AZ.length()
+
+	Lsq = x0*x0+y0*y0
+	L = math.sqrt(Lsq)
+	L1sq = L1*L1
+	L2sq = L2*L2
+	p = (Lsq+L1sq-L2sq)/(2*L)
+	h = math.sqrt(abs(L1sq-p*p))
+
+	p_cap = P.normalize()
+	h_cap = RAD*y0 - AZ*x0
+	answer = O+p*p_cap+h*h_cap
+	return answer
+

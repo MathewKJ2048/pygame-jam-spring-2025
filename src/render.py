@@ -95,6 +95,8 @@ def render_selection_plate(surface,b,game):
 
 
 
+
+
 def render(game):
 	surface = pygame.Surface((WIDTH,HEIGHT))
 	surface.fill(BACKGROUND)

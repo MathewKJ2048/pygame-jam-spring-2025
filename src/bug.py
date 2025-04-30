@@ -1,28 +1,85 @@
 from conf import *
 from object import *
 
+
+
+
+
 class Bug(PlacedObject):
 	def __init__(self):
 		super().__init__()
 		self.v = I
 		self.time = 0
 		self.target = None
-		self.leg_positions_relative = [unit_vector3(i*math.pi/3) for i in range(6)]
+		self.color = YELLOW
+		self.compute_geometry()
+		
+	
+	def compute_geometry(self):
+		self.N = 4
+		self.IDEAL_LEG_POSITIONS_RELATIVE = [unit_vector3(i*2*math.pi/self.N) for i in range(self.N)]
+		self.BASE = [K3/2+t/4 for t in self.IDEAL_LEG_POSITIONS_RELATIVE]
+		offset = [
+			((self.IDEAL_LEG_POSITIONS_RELATIVE[i]+self.IDEAL_LEG_POSITIONS_RELATIVE[(i+1)%self.N])/2)
+			.normalize()*self.IDEAL_LEG_POSITIONS_RELATIVE[i].length() for i in range(self.N)]
+		self.TOP = [3*K3/4+t/4 for t in offset]
+		self.L1 = (self.BASE[0]-self.IDEAL_LEG_POSITIONS_RELATIVE[0]).length()
+		self.L2 = self.L1
+
+		self.leg_positions_relative = self.IDEAL_LEG_POSITIONS_RELATIVE.copy()
+		self.target_leg_positions = self.IDEAL_LEG_POSITIONS_RELATIVE.copy()
+		
 	def evolve(self,dt):
 		self.chase_target()
 		self.r = self.r+self.v*dt*self.size()
 		self.time+=dt
 		self.legs_slide_back(dt)
-		self.steps()
+		self.update_target_leg_positions()
+		self.steps(dt)
+	def get_color(self):
+		return self.color
 	def legs_slide_back(self,dt):
 		change = Vector3(*self.v*dt,0)
 		self.leg_positions_relative = [r - change for r in self.leg_positions_relative]
-	def steps(self):
-		ideal_relative_leg_positions = [unit_vector3(i*math.pi/3) for i in range(6)]
-		for i in range(6):
-			diff = ideal_relative_leg_positions[i]-self.leg_positions_relative[i]
-			if diff.length()>GAIT:
-				self.leg_positions_relative[i] = ideal_relative_leg_positions[i]
+		self.target_leg_positions = [r - change for r in self.target_leg_positions]
+
+
+	def get_moving_feet(self):
+		needs_moving = []
+		for i in range(self.N):
+			if (self.leg_positions_relative[i]-self.target_leg_positions[i]).length()>0.001:
+				needs_moving.append(i)
+
+		# two adjacent legs can't move, opposite leg cannot move
+		movement = []
+		for i in needs_moving:
+			nb1 = (i-1+self.N)%self.N
+			nb2 = (i+1)%self.N
+			opp = (i+self.N//2)%self.N
+			L = (self.BASE[i] - self.leg_positions_relative[i]).length()
+			alright = 1.1*L<self.L1+self.L2
+			assert type(alright)==bool
+			log("alright"+str(i),str(alright))
+			if (nb1 not in movement and nb2 not in movement and opp not in movement) or not alright:
+				movement.append(i)
+		return movement
+
+	def steps(self,dt):
+		movement = self.get_moving_feet()
+		for i in range(self.N):
+			if i not in movement:
+				continue
+			self.leg_positions_relative[i] = lerp_approach(
+				self.leg_positions_relative[i],
+				self.target_leg_positions[i],5*self.v.length(),dt)
+
+	def update_target_leg_positions(self):
+		for i in range(self.N):
+			drift = abs(self.IDEAL_LEG_POSITIONS_RELATIVE[i].length()-self.leg_positions_relative[i].length())
+			diff = (self.IDEAL_LEG_POSITIONS_RELATIVE[i] - self.leg_positions_relative[i]).length()
+			if drift>GAIT or diff>0.5:
+				self.target_leg_positions[i] = self.IDEAL_LEG_POSITIONS_RELATIVE[i]
+
 
 	def chase_target(self):
 		if not self.target:
@@ -31,11 +88,23 @@ class Bug(PlacedObject):
 		if diff_r.length()==0:
 			return
 		self.v = self.v.length()*diff_r.normalize()
+
+
 	def get_lines(self):
-		base = [K3/2+unit_vector3(i*math.pi/3)/4 for i in range(6)]
-		top = [3*K3/4+unit_vector3(i*math.pi/3 + math.pi/6)/4 for i in range(6)]
-		forward_connections = [(base[i],top[i]) for i in range(6)]
-		backward_connections = [(top[i],base[(i+1)%6]) for i in range(6)]
-		legs = [(base[i],self.leg_positions_relative[i]) for i in range(6)]
-		return make_pair_list(base)+make_pair_list(top)+forward_connections+backward_connections+legs
+		ankles = [t for t in self.leg_positions_relative]
+
+		forward_connections = [(self.BASE[i],self.TOP[i]) for i in range(self.N)]
+		backward_connections = [(self.TOP[i],self.BASE[(i+1)%self.N]) for i in range(self.N)]
+		lower = [(b,K3/4) for b in self.BASE]
+		upper = [(t,K3) for t in self.TOP]
+
+		knees = [solve(self.L1,self.L2,ankles[i],self.BASE[i]) for i in range(self.N)]
+		thighs = [(self.BASE[i],knees[i]) for i in range(self.N)]
+		calves = [(knees[i],ankles[i]) for i in range(self.N)]
+		feet = []
+		for i in range(self.N):
+			t = ankles[i]
+			feet+=[(t,t+unit_vector3(i*2*math.pi/3)/6) for i in range(3)]
+	
+		return make_pair_list(self.BASE)+make_pair_list(self.TOP)+forward_connections+backward_connections+upper+lower+thighs+calves+feet+make_pair_list(self.target_leg_positions)
 		
