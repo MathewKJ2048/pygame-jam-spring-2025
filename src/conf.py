@@ -1,6 +1,7 @@
 import time
 import pygame
 from pygame import Vector2
+from pygame import Vector3
 import math
 import random
 import os
@@ -32,3 +33,8 @@ CAMERA_CONSTANT_SCALE = 100
 
 I = Vector2(1,0)
 J = Vector2(0,1)
+
+VELOCITY = 8
+
+def unit_vector(theta):
+	return math.cos(theta)*I + math.sin(theta)*J

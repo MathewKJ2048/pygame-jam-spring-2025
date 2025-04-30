@@ -10,12 +10,13 @@ class Game:
 		self.objects = []
 		self.running = True
 		self.camera = Vector2(0,0)
+		self.camera_angle = math.pi/6 * 0
 		self.scale = 1
 		self.builder = Builder()
 
 	def evolve(self,dt):
 		self.builder.evolve(dt)
-		self.builder.parent = self.get_current_space()
+		self.builder.set_parent(self.get_current_space())
 		self.init_space_at_builder()
 		pass
 	def exit(self):
