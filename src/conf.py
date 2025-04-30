@@ -43,6 +43,9 @@ VELOCITY = 8
 def unit_vector(theta):
 	return math.cos(theta)*I + math.sin(theta)*J
 
+def unit_vector3(theta):
+	return math.cos(theta)*I3 + math.sin(theta)*J3
+
 def make_pair_list(base_list):
 	pair_list = []
 	for i in range(len(base_list)):

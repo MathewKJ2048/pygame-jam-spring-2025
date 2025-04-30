@@ -10,7 +10,7 @@ class Game:
 		self.objects = []
 		self.running = True
 		self.camera = Vector2(0,0)
-		self.camera_angle = math.pi/6 * 0
+		self.camera_angle = math.pi/6
 		self.scale = 1
 		self.builder = Builder()
 

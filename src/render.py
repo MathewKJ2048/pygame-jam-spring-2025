@@ -27,16 +27,21 @@ def render_object(surface,o,game):
 	for pp in point_pairs:
 		pygame.draw.aaline(surface,o.get_color(),pp[0],pp[1],width=o.get_width())
 
-def render_surface_base(surface,s,game):
+def render_space_base(surface,s,game):
 	points = [project3(Vector3(s.r.x,s.r.y,0)+t[0]*s.size(),game) for t in s.get_lines()]
 	pygame.draw.polygon(surface,darken(s.get_color(),0.5),points)
 
-def render_space(surface,s,game):
-	render_object(surface,s,game)
-	
 
 def render_builder(surface,b,game):
 	render_object(surface, game.builder, game)
+
+def render_selection_plate(surface,b,game):
+	if not b.parent:
+		return
+	s = b.parent
+	points = [project3(Vector3(s.r.x,s.r.y,0)+t[0]*s.size()*3/4,game) for t in s.get_lines()]
+	pygame.draw.polygon(surface,WHITE,points,width=2)
+
 
 
 def render(game):
@@ -46,8 +51,10 @@ def render(game):
 		return s.level
 	game.spaces.sort(key=key)
 	for s in game.spaces:
-		render_surface_base(surface,s,game)
+		render_space_base(surface,s,game)
+	
 	for s in game.spaces:
-		render_space(surface,s,game)
+		render_object(surface,s,game)
+	render_selection_plate(surface,game.builder,game)
 	render_builder(surface, game.builder, game)
 	return surface
