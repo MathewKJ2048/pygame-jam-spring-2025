@@ -37,7 +37,7 @@ def clip_point_pair(pp):
 def draw_line(surface,pp,color,width):
 	pp = clip_point_pair(pp)
 	if pp:
-		pygame.draw.aaline(surface,color,pp[0],pp[1],width=width)
+		pygame.draw.line(surface,color,pp[0],pp[1],width=width)
 	
 
 def project(r,game):
@@ -109,12 +109,15 @@ def render(game):
 	def filter_list_objects(lobj):
 		filtered = []
 		for o in lobj:
+			if (o.r-game.camera).length() > o.size()*(SUBDIVISION**game.camera_level)*10:
+				continue
 			if o.level <= game.camera_level+3:
 				filtered.append(o)
 		return filtered
 
 	spaces = filter_list_objects(game.spaces)
 	objects = filter_list_objects(game.objects)
+	log("number rendered",len(spaces)+len(objects))
 
 	def key(s):
 		return s.level
