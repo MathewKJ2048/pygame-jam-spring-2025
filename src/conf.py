@@ -9,6 +9,8 @@ from colors import *
 
 CLOCK = pygame.time.Clock()
 
+NAME = "Grid Surge"
+
 debug_transcript = {}
 def log(key,value=None):
 	global debug_transcript
