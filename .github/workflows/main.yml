@@ -1,0 +1,51 @@
+name: Build and Push Webapp
+
+on:
+  push:
+    branches:
+      - main  # Adjust according to your default branch
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: "./main/"
+      
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: web-app
+          path: "./web-app/"
+        
+      - name: install pygbag
+        run: |
+          pip install pygbag
+
+      - name: make web app
+        run: |
+          cd ./main
+          make build
+
+      - name: edit web-app
+        run: |
+          cd ./web-app
+          git config --global user.email "web-app@github.com"
+          git config --global user.name "web-app-generator"
+          cd ..
+          rm -rf ./web-app/*
+          cp -r ./main/src/build/web/* ./web-app/
+          cd ./web-app/
+          git add .
+          git commit -m "built web-app"
+
+      - name: push to repo
+        run: |
+          cd ./web-app
+          git push      
+
+      
