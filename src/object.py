@@ -22,7 +22,7 @@ class GameObject:
 
 class PlacedObject(GameObject):
 	def size(self):
-		return SUBDIVISION**(-self.level+1)
+		return SUBDIVISION**(min(-self.level+1,0))
 
 class Port:
 	def __init__(self,parent,r):
