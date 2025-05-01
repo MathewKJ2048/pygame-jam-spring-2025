@@ -21,8 +21,13 @@ class GameObject:
 		return 2
 
 class PlacedObject(GameObject):
-	def size(self):
-		return SUBDIVISION**(min(-self.level+1,0))
+	def set_parent(self,parent):
+		if parent:
+			self.parent = parent
+			self.level = parent.level
+		else:
+			self.parent = None
+			self.level = 0
 
 class Port:
 	def __init__(self,parent,r):

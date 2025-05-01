@@ -78,7 +78,7 @@ def render_space_base(surface,s,game):
 
 def render_builder(surface,b,game):
 	temp = game.builder.level
-	game.builder.level = game.camera_level+1
+	game.builder.level = game.camera_level
 	render_object(surface, game.builder, game)
 	game.builder.level = temp
 

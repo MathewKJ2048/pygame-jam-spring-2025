@@ -33,7 +33,7 @@ class Game:
 			if type(o)==Bug:
 				o.set_parent(self.get_current_space(o))
 		
-		target = self.builder.level-1
+		target = self.builder.level
 		self.camera_level = lerp_approach(self.camera_level,target,abs(self.camera_level-target),dt)
 		self.camera = self.builder.r.copy()
 
