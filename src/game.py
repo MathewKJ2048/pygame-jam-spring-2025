@@ -160,9 +160,12 @@ class Game:
 		# connect to each network, from largest to smallest
 		for n in network_classes:
 			best = pick_best(t,n)
-			if best:
-				t.connect(best)
-				self.compute_networks()
+			if not best:
+				continue
+			if best in t.network.objects: # no need to make cycles
+				continue
+			t.connect(best)
+			self.compute_networks()
 		return
 
 	def builder_in_space(self):
