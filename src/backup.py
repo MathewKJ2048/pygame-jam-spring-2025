@@ -40,9 +40,7 @@ def process_pressed_keys(game):
 	game.builder.v*=VELOCITY
 
 
-pygame.init()
-screen = pygame.display.set_mode([WIDTH, HEIGHT])
-pygame.display.set_caption(NAME)
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 def play():
 	game = init_game()
@@ -62,7 +60,6 @@ def play():
 		screen.blit(render(game),(0,0))
 		pygame.display.flip()
 		print_logs(dt)
-
 
 
 def main():

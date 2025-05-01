@@ -2,6 +2,8 @@ from conf import *
 from game import *
 from render import *
 
+from shader_code import *
+
 
 def init_game():
 	game = Game()
@@ -40,13 +42,15 @@ def process_pressed_keys(game):
 	game.builder.v*=VELOCITY
 
 
-pygame.init()
-screen = pygame.display.set_mode([WIDTH, HEIGHT])
-pygame.display.set_caption(NAME)
+
 
 def play():
 	game = init_game()
+	screen = pygame.Surface((WIDTH, HEIGHT))
+
 	while game.running:
+
+		screen.blit(render(game),(0,0))
 
 		dt = CLOCK.tick(MAX_FRAME_RATE)/1000
 
@@ -59,9 +63,16 @@ def play():
 
 		game.evolve(dt)
 
-		screen.blit(render(game),(0,0))
+
+		frame_tex = surf_to_texture(screen)
+		frame_tex.use(0)
+		program['sceneTexture'] = 0
+		render_object.render(mode=moderngl.TRIANGLE_STRIP)
+
 		pygame.display.flip()
 		print_logs(dt)
+
+		frame_tex.release()
 
 
 

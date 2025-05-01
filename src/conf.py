@@ -7,9 +7,18 @@ import random
 import os
 from colors import *
 
+NAME = "Grid Surge"
+WIDTH = 1200
+HEIGHT = 800
+
+pygame.init()
+pygame.display.set_caption(NAME)
+
+
+
 CLOCK = pygame.time.Clock()
 
-NAME = "Grid Surge"
+
 
 debug_transcript = {}
 def log(key,value=None):
@@ -26,8 +35,7 @@ MAX_FRAME_RATE = 60
 
 DEBUG = True
 
-WIDTH = 1200
-HEIGHT = 800
+
 
 DUAL = 0
 INPUT = 1
