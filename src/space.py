@@ -14,6 +14,12 @@ class Space(GameObject):
 			(-I3+J3)/2
 		])
 
+	def get_descendants(self):
+		d = self.children
+		for c in self.children:
+			d+=c.get_descendants()
+		return d
+
 	def get_color(self):
 		if self.level%2 == 0:
 			return MAGENTA

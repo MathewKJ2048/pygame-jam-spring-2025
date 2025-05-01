@@ -40,7 +40,7 @@ class Port:
 	def is_free(self):
 		return self.connection == None
 	def is_compatible(self,p):
-		return (self.type == DUAL) or (p.type == DUAL) or (self.type != p.type)
+		return (self.type == DUAL) or (p.type == DUAL)
 	def connect(self,p):
 		p.connection = self
 		self.connection = p
@@ -51,11 +51,15 @@ class Port:
 		return self.connection.parent
 
 class PoweredObject(PlacedObject):
-	PORT_NUM = 4
+	PORT_NUM = 1
 	RANGE = 1
+	CAPACITY = 0
 	def __init__(self):
 		super().__init__()
 		self.PORTS = [Port(self,Vector3(0,0,0)) for i in range(type(self).PORT_NUM)]
+		self.production_rate = 0
+		self.consumption_rate = 0
+		self.stored = 0
 	
 	def get_connected_objects(self):
 		return [p.connection.parent for p in self.get_connected_ports()]
@@ -128,6 +132,20 @@ class PoweredObject(PlacedObject):
 				if pu.get_connected_object() == self and pv.get_connected_object() == o:
 					pu.disconnect(pv)
 					return True
+
+class SingleSourcePoweredObject(PoweredObject):
+	PORT_NUM = 1
+	def __init__(self):
+		super().__init__()
+		for p in self.PORTS:
+			p.type = OUTPUT
+
+class SingleSinkPoweredObject(PoweredObject):
+	PORT_NUM = 1
+	def __init__(self):
+		super().__init__()
+		for p in self.PORTS:
+			p.type = INPUT
 
 		
 

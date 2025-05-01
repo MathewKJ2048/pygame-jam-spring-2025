@@ -71,10 +71,15 @@ def unit_vector3(theta):
 	return math.cos(theta)*I3 + math.sin(theta)*J3
 
 def make_pair_list(base_list):
-	pair_list = []
-	for i in range(len(base_list)):
-		pair_list.append((base_list[i],base_list[(i+1)%len(base_list)]))
-	return pair_list
+	return [(base_list[i],base_list[(i+1)%len(base_list)]) for i in range(len(base_list))]
+
+def interweave(l1,l2,offset=0):
+	N = len(l1)
+	offset = offset+2*N
+	return [(l1[i],l2[(i+offset)%N]) for i in range(N)]
+
+def join(l,u):
+	return [(t,u) for t in l]
 
 def lerp_approach(current,target,rate,dt): # returns new target
 	change = rate*dt
