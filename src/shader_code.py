@@ -29,10 +29,9 @@ out vec4 fragColor;
 
 void main() {
 
-	
 
-	vec2 r = uvs.xy;
-    fragColor = vec4(texture(sceneTexture, r.xy).rgb, 1.0);
+	// vec2 r = uvs.xy;
+    // fragColor = vec4(texture(sceneTexture, r.xy).rgb, 1.0);
 }
 '''
 
