@@ -62,10 +62,13 @@ class Port:
 		p.connection = self
 		self.connection = p
 	def disconnect(self):
-		self.connection.connection = None
-		self.connection = None
+		if self.connection:
+			self.connection.connection = None
+			self.connection = None
 	def get_connected_object(self):
-		return self.connection.parent
+		if self.connection:
+			return self.connection.parent
+		return None
 
 class PoweredObject(PlacedObject):
 	PORT_NUM = 1
@@ -146,10 +149,10 @@ class PoweredObject(PlacedObject):
 			return False
 		if self not in o.get_connected_objects():
 			return False
-		for pu in o.ports:
-			for pv in self.ports:
+		for pu in o.PORTS:
+			for pv in self.PORTS:
 				if pu.get_connected_object() == self and pv.get_connected_object() == o:
-					pu.disconnect(pv)
+					pu.disconnect()
 					return True
 
 class SingleSourcePoweredObject(PoweredObject):

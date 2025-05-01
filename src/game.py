@@ -106,12 +106,13 @@ class Game:
 		o.parent.children.remove(o)
 	
 	def remove_powered_object(self,o):
+		self.remove_object(o)
 		connected_objects = o.get_connected_objects()
 		for c in connected_objects:
 			c.disconnect(o)
+			self.compute_networks()
 		for c in connected_objects:
 			self.make_connection(c)
-		self.remove_object(o)
 
 	def remove_selected_object(self):
 		space = self.get_current_space(self.builder)
@@ -119,18 +120,24 @@ class Game:
 			return False
 		if space.is_free():
 			return False
-		pass
+		selected_object = space.get_placed_objects()[0]
+		if isinstance(selected_object,PoweredObject):
+			self.remove_powered_object(selected_object)
+		else:
+			self.remove_object(selected_object)
+		return True
 
 		
 	def make_connection(self,t):
 
-		# get all suitable
+		# get all suitable (in range, and not already transitively connected)
 		powered_objects = [o for o in self.objects if isinstance(o,PoweredObject)]
-		suitable = [o for o in powered_objects if o!=t and t.is_connectable(o)]
-
-		# use network logic to form equivalence classes
 		self.compute_networks()
-		network_classes = [[s for s in suitable if n.contains(s)] for n in self.networks]
+		suitable = [o for o in powered_objects if o!=t and t.is_connectable(o) and t not in o.network.objects]
+
+		# use network to form equivalence classes
+		network_classes_unprocessed = [[s for s in suitable if n.contains(s)] for n in self.networks]
+		network_classes = [n for n in network_classes_unprocessed if len(n) != 0]
 
 		# in each equivalence class, pick the best one
 		def pick_best(o, options): # assuming all options are viable:
@@ -201,7 +208,6 @@ class Game:
 		self.place_powered_object(Warper())
 
 
-
 def process_pressed_keys(game):
 	pressed_keys = pygame.key.get_pressed()
 	game.builder.v = Vector2(0,0)
@@ -234,3 +240,5 @@ def process_keydown_event(event,game):
 		game.place_warper()
 	if event.key == pygame.K_c:
 		game.place_cannon()
+	if event.key == pygame.K_q:
+		game.remove_selected_object()
