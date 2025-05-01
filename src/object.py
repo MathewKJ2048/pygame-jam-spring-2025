@@ -29,6 +29,23 @@ class PlacedObject(GameObject):
 			self.parent = None
 			self.level = 0
 
+class Network:
+	def __init__(self):
+		self.objects = []
+	def get_total_energy(self):
+		energy = 0
+		for o in self.objects:
+			energy+=o.stored
+		return energy
+	def get_net_rate(self):
+		rate = 0
+		for o in self.objects:
+			rate+=o.production_rate-o.consumption_rate
+		return rate
+	def contains(self,o):
+		return o in self.objects
+
+
 class Port:
 	def __init__(self,parent,r):
 		self.parent = parent
@@ -60,6 +77,8 @@ class PoweredObject(PlacedObject):
 		self.production_rate = 0
 		self.consumption_rate = 0
 		self.stored = 0
+		self.network = Network()
+		self.network.objects.append(self)
 	
 	def get_connected_objects(self):
 		return [p.connection.parent for p in self.get_connected_ports()]

@@ -6,6 +6,9 @@ class Space(GameObject):
 		super().__init__(parent=parent)
 		self.children = []
 
+	def get_placed_objects(self):
+		return [o for o in self.children if isinstance(o,PlacedObject)]
+
 	def get_lines(self):
 		return make_pair_list([
 			(I3+J3)/2,
@@ -42,7 +45,4 @@ class Space(GameObject):
 		return True
 
 	def is_free(self):
-		for c in self.children:
-			if type(c)!=Space:
-				return False
-		return True
+		return len(self.get_placed_objects()) == 0

@@ -20,26 +20,20 @@ class Game:
 		self.camera_level = 0
 		self.builder = Builder()
 		self.particles = []
+		self.networks = []
 	
 	def scale(self):
 		return SUBDIVISION**(self.camera_level)
+	
+	def exit(self):
+		self.running = False
 
-	def evolve(self,dt):
-
-		self.builder.evolve(dt)
-		self.builder.set_parent(self.get_current_space(self.builder))
-		self.init_space_at_builder()
-
-		for o in self.objects:
-			if type(o) in [Bug]:
-				o.evolve(dt)
-			if type(o)==Bug:
-				o.set_parent(self.get_current_space(o))
-		
+	def evolve_camera(self,dt):
 		target = self.builder.level
 		self.camera_level = lerp_approach(self.camera_level,target,abs(self.camera_level-target),dt)
 		self.camera = self.builder.r.copy()
 
+	def generate_log(self):
 		num_types = {}
 		for o in self.objects:
 			key = str(type(o))
@@ -49,9 +43,21 @@ class Game:
 				num_types[key]=1
 		log("object-readout",str(num_types))
 
-	def exit(self):
-		self.running = False
+	def evolve(self,dt):
 
+		self.builder.evolve(dt)
+		self.builder.set_parent(self.get_current_space(self.builder))
+		self.init_space_at_builder()
+
+		for o in self.objects:
+			if type(o)==Bug:
+				o.evolve(dt)
+				o.set_parent(self.get_current_space(o))
+		
+		self.evolve_camera(dt)
+		self.generate_log()
+
+	
 
 	def get_current_space(self,o):
 		level = -1
@@ -62,17 +68,22 @@ class Game:
 				level = s.level
 		return space
 
-
-	def expand(self):
-		
-		space = self.get_current_space(self.builder)
-		if not space:
-			return
-		if not space.is_free():
-			return
-		space.subdivide()
-		for c in space.children:
-			self.spaces.append(c)
+	def compute_networks(self):
+		self.networks = []
+		for o in self.objects:
+			if not isinstance(o,PoweredObject):
+				continue
+			redundant = False
+			for n in self.networks:
+				if n.contains(o):
+					redundant = True
+					break
+			if redundant:
+				continue
+			n = Network()
+			n.objects = o.get_network_objects()
+			self.networks.append(n)
+			o.network = n
 
 	def place_object(self,o):
 		space = self.get_current_space(self.builder)
@@ -86,80 +97,73 @@ class Game:
 		self.objects.append(o)
 		return True
 
-	def place_bug(self):
-		b = Bug()
-		if self.place_object(b):
-			b.target = self.builder
+	def place_powered_object(self,o):
+		self.place_object(o)
+		self.make_connection(o)
 
-
-	def place_engine(self):
-		e = Engine()
-		self.place_object(e)
-		self.make_connection(e)
-
-	def place_tower(self):
-		t = Tower()
-		self.place_object(t)
-		self.make_connection(t)
-
-	def place_high_tower(self):
-		t = HighTower()
-		self.place_object(t)
-		self.make_connection(t)
+	def remove_object(self,o):
+		self.objects.remove(o)
+		o.parent.children.remove(o)
 	
-	def place_battery(self):
-		b = Battery()
-		self.place_object(b)
-		self.make_connection(b)
+	def remove_powered_object(self,o):
+		connected_objects = o.get_connected_objects()
+		for c in connected_objects:
+			c.disconnect(o)
+		for c in connected_objects:
+			self.make_connection(c)
+		self.remove_object(o)
 
-	def place_cannon(self):
-		c = Cannon()
-		self.place_object(c)
-		self.make_connection(c)
-	
-	def place_warper(self):
-		w = Warper()
-		self.place_object(w)
-		self.make_connection(w)
+	def remove_selected_object(self):
+		space = self.get_current_space(self.builder)
+		if not space:
+			return False
+		if space.is_free():
+			return False
+		pass
+
 		
 	def make_connection(self,t):
-		# connection policy:
-		# find all within range
-		# then find the one with the largest number of open connections
-		# then connect to it
-		# nonononononononononononononono
+
 		# get all suitable
+		powered_objects = [o for o in self.objects if isinstance(o,PoweredObject)]
+		suitable = [o for o in powered_objects if o!=t and t.is_connectable(o)]
+
 		# use network logic to form equivalence classes
-		# in each equivalence class, pick the ones with the most open connections
-		# of them, pick the ones which are closest
-		suitable = []
-		for o in self.objects:
-			if not isinstance(o,PoweredObject) or o==t:
-				continue
-			if not t.is_connectable(o):
-				continue
-			suitable.append(o)
+		self.compute_networks()
+		network_classes = [[s for s in suitable if n.contains(s)] for n in self.networks]
 
-		networks = []
-		for s in suitable:
-			redundant = False
-			for n in networks:
-				if s in n:
-					redundant = True
-			if not redundant:
-				networks.append([t for t in s.get_network_objects() if t in suitable]) # subset of suitable objects in network
+		# in each equivalence class, pick the best one
+		def pick_best(o, options): # assuming all options are viable:
+			# if o has only one free port, the ones with just one free port are rejected
+			if len(o.get_free_ports()) == 1:
+				options = [op for op in options if len(op.get_free_ports())!=1]
+			if len(options)==0:
+				return None
 
-		networks.sort(key=lambda t: -len(t)) # sort networks by size
-		for n in networks:
-			n.sort(key=lambda o: -len(o.get_free_ports())) # sort individual elements by connectivity
-		for n in networks:
-			t.connect(n[0]) # attempt to connect to each network, from largest to smallest
+			# same level is preferred
+			# within same level, closest is preferred
+			best_diff_in_levels = min([abs(o.level-op.level) for op in options]) # extract minimum level diff
+			options = [op for op in options if abs(o.level-op.level) == best_diff_in_levels] # filter level
+			options.sort(key=lambda op: (o.r-op.r).length()) # sort by size
+			return options[0]
+
+		# sort the equivalence classes by network size
+		network_classes.sort(key=lambda n: -len(n[0].network.objects))
+
+		# connect to each network, from largest to smallest
+		for n in network_classes:
+			best = pick_best(t,n)
+			if best:
+				t.connect(best)
+				self.compute_networks()
+		return
 
 	def builder_in_space(self):
 		for s in self.spaces:
 			if s.contains(self.builder):
 				return True
 		return False
+
 	def init_space_at_builder(self):
 		if self.builder_in_space():
 			return False
@@ -168,6 +172,33 @@ class Game:
 		space = Space()
 		space.r = r_
 		self.spaces.append(space)
+
+	def expand(self):
+		space = self.get_current_space(self.builder)
+		if not space:
+			return
+		if not space.is_free():
+			return
+		space.subdivide()
+		for c in space.children:
+			self.spaces.append(c)
+
+	def place_bug(self):
+		b = Bug()
+		if self.place_object(b):
+			b.target = self.builder
+	def place_engine(self):
+		self.place_powered_object(Engine())
+	def place_tower(self):
+		self.place_powered_object(Tower())
+	def place_high_tower(self):
+		self.place_powered_object(HighTower())
+	def place_battery(self):
+		self.place_powered_object(Battery())
+	def place_cannon(self):
+		self.place_powered_object(Cannon())
+	def place_warper(self):
+		self.place_powered_object(Warper())
 
 
 
