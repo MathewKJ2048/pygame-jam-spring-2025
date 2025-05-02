@@ -1,0 +1,8 @@
+altgraph==0.17.4
+glcontext==3.0.0
+moderngl==5.12.0
+packaging==25.0
+pygame-ce==2.5.3
+pyinstaller==6.13.0
+pyinstaller-hooks-contrib==2025.3
+setuptools==80.1.0
