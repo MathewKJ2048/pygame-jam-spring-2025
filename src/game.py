@@ -49,11 +49,19 @@ class Game:
 		self.builder.set_parent(self.get_current_space(self.builder))
 		self.init_space_at_builder()
 
+		for o in self.spaces:
+			o.evolve(dt)
+
 		for o in self.objects:
 			o.evolve(dt)
 			if type(o)==Bug:
 				o.set_parent(self.get_current_space(o))
+			if type(o) == Warper:
+				self.operate_warper(o)
 		
+		for o in self.networks:
+			o.evolve(dt)
+
 		self.evolve_camera(dt)
 		self.generate_log()
 
@@ -113,6 +121,14 @@ class Game:
 			self.compute_networks()
 		for c in connected_objects:
 			self.make_connection(c)
+	
+
+	def remove_any_type_object(self,o):
+		if isinstance(o,PoweredObject):
+			self.remove_powered_object(o)
+		else:
+			self.remove_object(o)
+
 
 	def remove_selected_object(self):
 		space = self.get_current_space(self.builder)
@@ -120,11 +136,7 @@ class Game:
 			return False
 		if space.is_free():
 			return False
-		selected_object = space.get_placed_objects()[0]
-		if isinstance(selected_object,PoweredObject):
-			self.remove_powered_object(selected_object)
-		else:
-			self.remove_object(selected_object)
+		remove_any_type_object( space.get_placed_objects()[0])
 		return True
 
 		
@@ -189,9 +201,27 @@ class Game:
 			return
 		if not space.is_free():
 			return
+		self.subdivide_space(space)
+
+	def subdivide_space(self,space):
 		space.subdivide()
 		for c in space.children:
-			self.spaces.append(c)
+			if type(c) == Space:
+				self.spaces.append(c)
+
+	
+
+	def operate_warper(self,w):
+		space = w.parent
+		if not space:
+			return
+		if not w.is_full():
+			return
+		if space.is_divided():
+			return
+		assert w in space.children
+		self.subdivide_space(space)
+
 
 	def place_bug(self):
 		b = Bug()

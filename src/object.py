@@ -47,17 +47,25 @@ class Network:
 	def __init__(self):
 		self.objects = []
 	def get_total_energy(self):
-		energy = 0
-		for o in self.objects:
-			energy+=o.stored
-		return energy
+		return sum([o.stored for o in self.objects])
+		
 	def get_net_rate(self):
-		rate = 0
-		for o in self.objects:
-			rate+=o.production_rate-o.consumption_rate
-		return rate
+		return sum([o.production_rate-o.consumption_rate for o in self.objects])
+		
 	def contains(self,o):
 		return o in self.objects
+	
+	def evolve(self,dt):
+		dE = self.get_net_rate()*dt
+		# if energy is in shortfall, draw the energy from every node of the network
+		# if energy is in excess, add to every node of the network, if they have capacity
+		relevant_objects = [o for o in self.objects if (dE>0 and not o.is_full()) or (dE<0 and not o.is_empty())]
+		if len(relevant_objects)==0:
+			return
+		dEn = dE/len(relevant_objects)
+		for o in relevant_objects:
+			o.flow(dEn)
+		pass
 
 
 class Port:
@@ -87,15 +95,30 @@ class Port:
 class PoweredObject(PlacedObject):
 	PORT_NUM = 1
 	RANGE = 1
-	CAPACITY = 0
+	CAPACITY = 1
 	def __init__(self):
 		super().__init__()
-		self.PORTS = [Port(self,Vector3(0,0,0)) for i in range(type(self).PORT_NUM)]
+		self.PORTS = [Port(self,K3) for i in range(type(self).PORT_NUM)]
 		self.production_rate = 0
 		self.consumption_rate = 0
 		self.stored = 0
 		self.network = Network()
 		self.network.objects.append(self)
+
+	def is_full(self):
+		return type(self).CAPACITY == self.stored
+	
+	def is_empty(self):
+		return 0 == self.stored
+
+	def flow(self, energy):
+		self.stored += energy
+		self.stored = min(self.stored,type(self).CAPACITY)
+		self.stored = max(self.stored,0)
+
+	def get_animated_lines(self):
+		f = self.stored/type(self).CAPACITY
+		return super().get_animated_lines()+[(K3+I3*f/2,K3-I3*f/2)]
 	
 	def get_connected_objects(self):
 		return [p.connection.parent for p in self.get_connected_ports()]

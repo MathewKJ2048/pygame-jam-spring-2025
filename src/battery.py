@@ -2,6 +2,7 @@ from conf import *
 from object import *
 
 class Battery(PoweredObject):
+	CAPACITY = 10
 	def get_color(self):
 		return GREEN
 	def get_lines(self):

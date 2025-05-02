@@ -18,12 +18,23 @@ class Space(GameObject):
 		])
 
 	def get_animated_lines(self):
-		return self.get_lines()
+		l = self.get_lines()
+		f = min(self.time,1)
+		if f == 1:
+			return l
+		return [(f*u,f*v) for u,v in l]
+
+	def is_divided(self):
+		for c in self.children:
+			if type(c) == Space:
+				return True
+		return False
 
 	def get_descendants(self):
 		d = self.children
 		for c in self.children:
-			d+=c.get_descendants()
+			if type(c) == type(self):
+				d+=c.get_descendants()
 		return d
 
 	def get_color(self):
@@ -37,15 +48,12 @@ class Space(GameObject):
 		return diff_x < self.size()/2 and diff_y < self.size()/2
 
 	def subdivide(self):
-		if len(self.children) != 0:
-			return False
 		new_size = self.size()/SUBDIVISION
 		for i in range(SUBDIVISION):
 			for j in range(SUBDIVISION):
 				s = Space(parent=self)
 				s.r = self.r - (I+J)*self.size()/2 + (I+J)*new_size/2 + i*I*new_size + j*J*new_size
 				self.children.append(s)
-		return True
 
 	def is_free(self):
 		return len(self.get_placed_objects()) == 0
