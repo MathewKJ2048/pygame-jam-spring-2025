@@ -4,6 +4,9 @@ class GameObject:
 	def __init__(self,parent=None):
 		self.r = Vector2(0,0)
 		self.set_parent(parent)
+		self.time = 0
+	def evolve(self,dt):
+		self.time+=dt
 	def size(self):
 		return SUBDIVISION**(-self.level)
 	def set_parent(self,parent):
@@ -19,6 +22,17 @@ class GameObject:
 		return WHITE
 	def get_width(self):
 		return 2
+	def get_animated_lines(self):
+		f = min(self.time,1) # f is 0 initially, linearly grows to 1 then remains at 1
+		if f == 1:
+			return self.get_lines()
+		def process(pp):
+			p, q = pp
+			mid = (p+q)/2
+			p_, q_ = p-mid, q-mid
+			return (mid+p_*f,mid+q_*f)
+		l = self.get_lines()
+		return [process(pp) for pp in l]
 
 class PlacedObject(GameObject):
 	def set_parent(self,parent):

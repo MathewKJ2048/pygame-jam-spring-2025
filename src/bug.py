@@ -30,9 +30,9 @@ class Bug(PlacedObject):
 		self.target_leg_positions = self.IDEAL_LEG_POSITIONS_RELATIVE.copy()
 		
 	def evolve(self,dt):
+		super().evolve(dt)
 		self.chase_target()
 		self.r = self.r+self.v*dt*self.size()
-		self.time+=dt
 		self.legs_slide_back(dt)
 		self.update_target_leg_positions()
 		self.steps(dt)
@@ -93,14 +93,14 @@ class Bug(PlacedObject):
 	def get_lines(self):
 		ankles = [t for t in self.leg_positions_relative]
 
-		forward_connections = [(self.BASE[i],self.TOP[i]) for i in range(self.N)]
-		backward_connections = [(self.TOP[i],self.BASE[(i+1)%self.N]) for i in range(self.N)]
-		lower = [(b,K3/4) for b in self.BASE]
-		upper = [(t,K3) for t in self.TOP]
+		forward_connections = interweave(self.BASE,self.TOP,offset=-1)
+		backward_connections = interweave(self.BASE,self.TOP,offset=1)
+		lower = join(self.BASE,K3/4)
+		upper = join(self.TOP,K3/4)
 
 		knees = [solve(self.L1,self.L2,ankles[i],self.BASE[i]) for i in range(self.N)]
-		thighs = [(self.BASE[i],knees[i]) for i in range(self.N)]
-		calves = [(knees[i],ankles[i]) for i in range(self.N)]
+		thighs = interweave(self.BASE,knees)
+		calves = interweave(knees, ankles)
 		feet = []
 		for i in range(self.N):
 			t = ankles[i]

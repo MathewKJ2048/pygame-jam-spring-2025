@@ -17,6 +17,9 @@ class Space(GameObject):
 			(-I3+J3)/2
 		])
 
+	def get_animated_lines(self):
+		return self.get_lines()
+
 	def get_descendants(self):
 		d = self.children
 		for c in self.children:

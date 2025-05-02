@@ -10,7 +10,7 @@ from cannon import *
 
 
 class Game:
-	def __init__(self):
+	def __init__(self): 
 		self.time = 0
 		self.spaces = []
 		self.objects = []
@@ -50,8 +50,8 @@ class Game:
 		self.init_space_at_builder()
 
 		for o in self.objects:
+			o.evolve(dt)
 			if type(o)==Bug:
-				o.evolve(dt)
 				o.set_parent(self.get_current_space(o))
 		
 		self.evolve_camera(dt)

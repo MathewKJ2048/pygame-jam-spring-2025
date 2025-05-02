@@ -57,10 +57,9 @@ def project3(r_,game):
 	v = r.x*I_transform + r.y*J_transform + r.z*K_transform
 	return project(v,game)
 
-
 def render_object(surface,o,game):
 	r0 = Vector3(o.r.x,o.r.y,0)
-	pairs = o.get_lines()
+	pairs = o.get_animated_lines()
 	def transform(r):
 		return project3(r0 + r*o.size(),game)
 	def transform_pair(p):
@@ -100,8 +99,6 @@ def render_wires(surface,object_list,game):
 			draw_line(surface,pp,YELLOW,2)
 
 
-
-
 def render(game):
 	surface = pygame.Surface((WIDTH,HEIGHT))
 	surface.fill(BACKGROUND)
@@ -109,7 +106,8 @@ def render(game):
 	def filter_list_objects(lobj):
 		filtered = []
 		for o in lobj:
-			if (o.r-game.camera).length() > o.size()*(SUBDIVISION**game.camera_level)*10:
+			# distance more than max distance seen by camera + max distance covered by object
+			if (o.r-game.camera).length() > 2*o.size() + 8*(SUBDIVISION**game.camera_level):
 				continue
 			if o.level <= game.camera_level+3:
 				filtered.append(o)
