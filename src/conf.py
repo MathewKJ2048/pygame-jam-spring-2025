@@ -97,6 +97,12 @@ def lerp_approach(current,target,rate,dt): # returns new target
 		return target
 	return current + (change*diff/diff_mag)
 
+def set_max(v,maximum):
+	l = v.length()
+	if l == 0:
+		return v
+	return v.normalize()*min(l,maximum)
+
 
 def solve(L1,L2,P,O):
 	P = P-O

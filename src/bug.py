@@ -1,14 +1,19 @@
 from conf import *
 from object import *
+from engine import *
 
 
 
 
 
 class Bug(PlacedObject):
+	UID = 0
 	def __init__(self):
 		super().__init__()
+		self.UID = Bug.UID
+		Bug.UID+=1
 		self.v = I
+		self.speed = 1
 		self.time = 0
 		self.target = None
 		self.color = (200,100,0)
@@ -31,7 +36,6 @@ class Bug(PlacedObject):
 		
 	def evolve(self,dt):
 		super().evolve(dt)
-		self.chase_target()
 		self.r = self.r+self.v*dt*self.size()
 		self.legs_slide_back(dt)
 		self.update_target_leg_positions()
@@ -44,6 +48,40 @@ class Bug(PlacedObject):
 		change = Vector3(*self.v*dt,0)
 		self.leg_positions_relative = [r - change for r in self.leg_positions_relative]
 		self.target_leg_positions = [r - change for r in self.target_leg_positions]
+
+	def set_target(self,object_list,backup_target=None):
+		target_object_list = [o for o in object_list if type(o) == Engine]
+		if len(target_object_list) == 0:
+			self.target = backup_target
+		else:
+			target_object_list.sort(key=lambda o: (self.r-o.r).length())
+			self.target = target_object_list[0]
+
+		THRESHHOLD = 1
+		bugs_swarm = [b for b in object_list if type(b)==Bug and (b.r-self.r).length()<=1 and b!=self]
+		direction = self.target.r - self.r
+		submissive = any([b.UID > self.UID for b in bugs_swarm]) # in presence of later bugs
+		diff_r = Vector2(0,0)
+		if not submissive:
+			diff_r = set_max(direction,1) # dominant bug chases targets, submissive bugs maintain swarm
+		for b in bugs_swarm:
+			if b.UID > self.UID: # all bugs repelled by bugs later than them
+				diff_r+=(self.r-b.r).normalize()
+		self.v = self.speed*set_max(diff_r,1)
+		return
+
+
+		if diff_r.length()>THRESHHOLD:
+			diff_r = set_max(diff_r,1)
+			submissive = False
+			for b in bugs_swarm:
+				if self.UID<b.UID:
+					submissive = True
+				diff_r+=(self.r-b.r).normalize()
+			if submissive:
+				self.diff_r -= 0
+		self.v = self.speed*set_max(diff_r,1)
+
 
 
 	def get_moving_feet(self):
@@ -81,13 +119,6 @@ class Bug(PlacedObject):
 				self.target_leg_positions[i] = self.IDEAL_LEG_POSITIONS_RELATIVE[i]
 
 
-	def chase_target(self):
-		if not self.target:
-			return
-		diff_r = self.target.r - self.r
-		if diff_r.length()==0:
-			return
-		self.v = self.v.length()*diff_r.normalize()
 
 
 	def get_lines(self):

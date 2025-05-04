@@ -43,6 +43,24 @@ class Game:
 				num_types[key]=1
 		log("object-readout",str(num_types))
 
+	def update_position(self,o):
+		if o.parent:
+			if o in o.parent.children:
+				o.parent.children.remove(o)
+		s = self.get_current_space(o)
+		if s:
+			o.set_parent(s)
+			s.children.append(o)
+
+	def remove_bug_objects(self,b):
+		s = self.get_current_space(b)
+		if not s:
+			return
+		for t in s.children:
+			if type(t) != Space and type(t) != Bug:
+				self.remove_any_type_object(t)
+
+
 	def evolve(self,dt):
 
 		self.builder.evolve(dt)
@@ -51,23 +69,32 @@ class Game:
 
 		for o in self.spaces:
 			o.evolve(dt)
-
 		for o in self.objects:
 			o.evolve(dt)
-			if type(o)==Bug:
-				o.set_parent(self.get_current_space(o))
-			if type(o) == Warper:
-				self.operate_warper(o)
-		
 		for o in self.networks:
 			o.evolve(dt)
+
+		bugs = [b for b in self.objects if isinstance(b,Bug)]
+		warpers = [w for w in self.objects if isinstance(w,Warper)]
+
+		for b in bugs:
+			self.update_position(b)
+			b.set_target(self.objects,backup_target=self.builder)
+			self.remove_bug_objects(b)
+		for w in warpers:
+			self.operate_warper(w)
+
 
 		self.evolve_camera(dt)
 		self.generate_log()
 
 		for o in self.objects:
 			if o.parent:
-				assert o in o.parent.children
+				if o not in o.parent.children:
+					log("error "+str(type(o)))
+					o.parent.children.append(o)
+
+
 
 	
 
