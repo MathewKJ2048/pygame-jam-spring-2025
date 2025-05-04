@@ -98,6 +98,26 @@ def render_wires(surface,object_list,game):
 			pp = (project3(p.get_r(),game),project3(p.connection.get_r(),game))
 			draw_line(surface,pp,YELLOW,2)
 
+def get_minimap(game):
+	def mini_project(r):
+		t = r - game.camera
+		S = MINI_SCALE*(SUBDIVISION**game.camera_level)
+		return (MINI_WIDTH/2+t.x*S, MINI_HEIGHT/2-t.y*S)
+	surface = pygame.Surface((MINI_WIDTH,MINI_HEIGHT))
+	surface.fill(BACKGROUND)
+	pygame.draw.circle(surface,game.builder.get_color(),mini_project(game.builder.r),2)
+	mini_objects = [o for o in game.objects if o.level<=game.builder.level ]
+	for o in mini_objects:
+		if type(o) != Bug and type(o) not in [Tower, HighTower]:
+			pygame.draw.circle(surface,o.get_color(),mini_project(o.r),BLIP_RADIUS)
+	for o in mini_objects:
+		if isinstance(o,PoweredObject):
+			for t in o.get_connected_objects():
+				pygame.draw.line(surface,YELLOW,mini_project(o.r),mini_project(t.r))
+	for o in mini_objects:
+		if type(o) == Bug:
+			pygame.draw.circle(surface,(200,20,20),mini_project(o.r),BLIP_RADIUS)
+	return surface
 
 def render(game):
 	surface = pygame.Surface((WIDTH,HEIGHT))
@@ -131,4 +151,7 @@ def render(game):
 	render_selection_plate(surface,game.builder,game)
 	render_wires(surface,game.objects,game)
 	render_builder(surface, game.builder, game)
+
+	surface.blit(get_minimap(game),(0,0))
+
 	return surface

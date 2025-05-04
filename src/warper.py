@@ -4,6 +4,7 @@ from object import *
 class Warper(SingleSinkPoweredObject):
 	def __init__(self):
 		super().__init__()
+		self.consumption_rate = 1
 	def get_color(self):
 		if self.level%2 == 0:
 			return CYAN

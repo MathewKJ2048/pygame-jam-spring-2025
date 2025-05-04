@@ -65,6 +65,10 @@ class Game:
 		self.evolve_camera(dt)
 		self.generate_log()
 
+		for o in self.objects:
+			if o.parent:
+				assert o in o.parent.children
+
 	
 
 	def get_current_space(self,o):
@@ -110,8 +114,11 @@ class Game:
 		self.make_connection(o)
 
 	def remove_object(self,o):
-		self.objects.remove(o)
-		o.parent.children.remove(o)
+		if o in self.objects:
+			self.objects.remove(o)
+		if o.parent:
+			if o in o.parent.children:
+				o.parent.children.remove(o)
 	
 	def remove_powered_object(self,o):
 		self.remove_object(o)
@@ -122,8 +129,32 @@ class Game:
 		for c in connected_objects:
 			self.make_connection(c)
 	
+	def remove_children_of_warper(self,w):
+		spaces_inside = [o for o in w.parent.children if type(o) == Space]
+		# remove all placed objects
+		for s in spaces_inside:
+			for o in s.children:
+				if isinstance(o,PlacedObject):
+					self.remove_any_type_object(o)
+		# remove spaces
+		self.remove_spaces_in_warper(w)
+		
 
+	def remove_spaces_in_warper(self,w):
+		parent_space = w.parent
+		spaces_inside = parent_space.get_space_descendants()
+		for s in spaces_inside:
+			self.spaces.remove(s)
+			if s in parent_space.children:
+				parent_space.children.remove(s)
+
+	def remove_warper(self,w):
+		self.remove_children_of_warper(w)
+		self.remove_powered_object(w)
+	
 	def remove_any_type_object(self,o):
+		if isinstance(o,Warper):
+			self.remove_warper(o)
 		if isinstance(o,PoweredObject):
 			self.remove_powered_object(o)
 		else:
@@ -136,7 +167,7 @@ class Game:
 			return False
 		if space.is_free():
 			return False
-		remove_any_type_object( space.get_placed_objects()[0])
+		self.remove_any_type_object( space.get_placed_objects()[0])
 		return True
 
 		
@@ -215,12 +246,10 @@ class Game:
 		space = w.parent
 		if not space:
 			return
-		if not w.is_full():
-			return
-		if space.is_divided():
-			return
-		assert w in space.children
-		self.subdivide_space(space)
+		if w.is_full() and not space.is_divided():
+			self.subdivide_space(space)
+		if w.is_empty() and space.is_divided():
+			self.remove_children_of_warper(w)
 
 
 	def place_bug(self):

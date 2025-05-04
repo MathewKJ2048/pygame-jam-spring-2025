@@ -30,12 +30,12 @@ class Space(GameObject):
 				return True
 		return False
 
-	def get_descendants(self):
+	def get_space_descendants(self):
 		d = self.children
 		for c in self.children:
 			if type(c) == type(self):
-				d+=c.get_descendants()
-		return d
+				d+=c.get_space_descendants()
+		return [s for s in d if type(s)==Space]
 
 	def get_color(self):
 		if self.level%2 == 0:

@@ -14,7 +14,10 @@ HEIGHT = 800
 pygame.init()
 pygame.display.set_caption(NAME)
 
-
+MINI_WIDTH = WIDTH/4
+MINI_HEIGHT = HEIGHT/4
+MINI_SCALE = 4
+BLIP_RADIUS = 2
 
 CLOCK = pygame.time.Clock()
 
