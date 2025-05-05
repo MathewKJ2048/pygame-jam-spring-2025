@@ -8,21 +8,22 @@ from engine import *
 
 class Bug(MovingObject):
 	UID = 0
-	def __init__(self):
+	MAX_HEALTH = 1
+	def __init__(self,N=4):
 		super().__init__()
 		self.UID = Bug.UID
 		Bug.UID+=1
-		self.v = I
-		self.speed = 1
+		self.v = Vector2(0,0)
+		self.speed = 2
 		self.time = 0
 		self.target = None
 		self.color = (200,100,0)
-		self.health = 1
+		self.N = N
 		self.compute_geometry()
 		
 	
 	def compute_geometry(self):
-		self.N = 4
+		
 		self.IDEAL_LEG_POSITIONS_RELATIVE = [unit_vector3(i*2*math.pi/self.N) for i in range(self.N)]
 		self.BASE = [K3/2+t/4 for t in self.IDEAL_LEG_POSITIONS_RELATIVE]
 		offset = [
@@ -36,6 +37,7 @@ class Bug(MovingObject):
 		self.target_leg_positions = self.IDEAL_LEG_POSITIONS_RELATIVE.copy()
 		
 	def evolve(self,dt):
+		log("health",self.health)
 		super().evolve(dt)
 		self.legs_slide_back(dt)
 		self.update_target_leg_positions()
@@ -67,7 +69,7 @@ class Bug(MovingObject):
 		for b in bugs_swarm:
 			if b.UID > self.UID: # all bugs repelled by bugs later than them
 				diff_r+=(self.r-b.r).normalize()
-		self.v = self.speed*set_max(diff_r,1)
+		self.v = self.speed*normalize_with_0(diff_r)
 		return
 
 
@@ -136,6 +138,33 @@ class Bug(MovingObject):
 		for i in range(self.N):
 			t = ankles[i]
 			feet+=[(t,t+unit_vector3(i*2*math.pi/3)/6) for i in range(3)]
+
+		body = make_pair_list(self.BASE)+make_pair_list(self.TOP)+forward_connections+backward_connections#+upper+lower
+		legs = thighs+calves+feet
 	
-		return make_pair_list(self.BASE)+make_pair_list(self.TOP)+forward_connections+backward_connections+upper+lower+thighs+calves+feet
+		return legs+body
 		
+
+def nimble():
+	b = Bug(N=4)
+	b.N = 4
+	b.color = ()
+	b.health = Bug.MAX_HEALTH/2
+	b.speed = 2
+	b.color = (220,120,150)
+	return b
+
+def normal():
+	b = Bug(N=6)
+	b.color = (220,100,150)
+	b.health = Bug.MAX_HEALTH
+	b.speed = 1
+	b.color = (250,160,0)
+	return b
+
+def tank():
+	b = Bug(N=8)
+	b.health = Bug.MAX_HEALTH*2
+	b.speed = 0.5
+	b.color = (220,20,60)
+	return b

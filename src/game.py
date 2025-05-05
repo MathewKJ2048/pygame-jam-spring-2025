@@ -7,6 +7,7 @@ from tower import *
 from battery import *
 from warper import *
 from cannon import *
+from particle import *
 
 
 class Game:
@@ -21,6 +22,7 @@ class Game:
 		self.builder = Builder()
 		self.particles = []
 		self.networks = []
+		self.particles = []
 	
 	def scale(self):
 		return SUBDIVISION**(self.camera_level)
@@ -42,14 +44,15 @@ class Game:
 			else:
 				num_types[key]=1
 		log("object-readout",str(num_types))
+		log("particles",len(self.particles))
 
 	def update_position(self,o):
 		if o.parent:
 			if o in o.parent.children:
 				o.parent.children.remove(o)
 		s = self.get_current_space(o)
+		o.set_parent(s)
 		if s:
-			o.set_parent(s)
 			s.children.append(o)
 
 	def remove_bug_objects(self,b):
@@ -58,8 +61,18 @@ class Game:
 			return
 		for t in s.children:
 			if type(t) != Space and type(t) != Bug:
-				self.remove_any_type_object(t)
+				t.health = 0
 
+	
+
+	def remove_unhealthy_objects(self):
+		for o in self.objects:
+			if isinstance(o,PlacedObject):
+				if o.health<=0:
+					self.remove_any_type_object(o)
+					self.particles+=o.get_final_particles()
+
+					play_sound(destruction_sound)
 
 	def evolve(self,dt):
 
@@ -72,6 +85,8 @@ class Game:
 		for o in self.objects:
 			o.evolve(dt)
 		for o in self.networks:
+			o.evolve(dt)
+		for o in self.particles:
 			o.evolve(dt)
 
 		bugs = [b for b in self.objects if isinstance(b,Bug)]
@@ -87,6 +102,7 @@ class Game:
 		for w in warpers:
 			self.operate_warper(w)
 
+		self.remove_unhealthy_objects()
 
 		self.evolve_camera(dt)
 		self.generate_log()
@@ -96,6 +112,16 @@ class Game:
 				if o not in o.parent.children:
 					log("error "+str(type(o)))
 					o.parent.children.append(o)
+
+		print(self.objects)
+		for o in self.objects:
+			self.particles+=o.make_particles()
+
+		for p in self.particles:
+			if p.time > p.max_time:
+				self.particles.remove(p)
+		
+		
 
 
 
@@ -137,6 +163,7 @@ class Game:
 		o.set_parent(space)
 		space.children.append(o)
 		self.objects.append(o)
+		play_sound(construction_sound)
 		return True
 
 	def place_powered_object(self,o):
@@ -278,12 +305,14 @@ class Game:
 			return
 		if w.is_full() and not space.is_divided():
 			self.subdivide_space(space)
+			play_sound(warp_sound)
 		if w.is_empty() and space.is_divided():
 			self.remove_children_of_warper(w)
+			play_sound(warp_sound)
 
 
 	def place_bug(self):
-		b = Bug()
+		b = random.choice([nimble(),normal(),tank()])
 		if self.place_object(b):
 			b.target = self.builder
 	def place_engine(self):
@@ -316,6 +345,7 @@ def process_pressed_keys(game):
 	game.builder.v*=VELOCITY
 
 def process_keydown_event(event,game):
+	
 	if event.key == pygame.K_s:
 		game.expand()
 	if event.key == pygame.K_b:
@@ -334,3 +364,11 @@ def process_keydown_event(event,game):
 		game.place_cannon()
 	if event.key == pygame.K_q:
 		game.remove_selected_object()
+	if event.key == pygame.K_m:
+		if get_MUSIC():
+			pygame.mixer.music.fadeout(1000)
+		else:
+			pygame.mixer.music.play(-1)
+		toggle_MUSIC()
+	if event.key == pygame.K_x:
+		toggle_SFX()

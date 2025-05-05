@@ -11,13 +11,45 @@ NAME = "Grid Surge"
 WIDTH = 1200
 HEIGHT = 800
 
+pygame.mixer.pre_init(44100,-16,2,512)
 pygame.init()
 pygame.display.set_caption(NAME)
+icon = pygame.image.load("assets/icon.ico")
+pygame.display.set_icon(icon)
+
+MUSIC = True
+SFX = True
+def get_MUSIC():
+	global MUSIC
+	return MUSIC
+def toggle_MUSIC():
+	global MUSIC
+	MUSIC = not MUSIC
+def get_SFX():
+	global SFX
+	return SFX
+def toggle_SFX():
+	global SFX
+	SFX = not SFX
+
+pygame.mixer.music.load("./assets/game_jam_music.wav")
+pygame.mixer.music.play()
+
+warp_sound = pygame.mixer.Sound('./assets/warp.wav')
+construction_sound = pygame.mixer.Sound("./assets/construction.wav")
+destruction_sound = pygame.mixer.Sound("./assets/destruction.wav")
+laser_sound = pygame.mixer.Sound("./assets/laser.wav")
+
+def play_sound(s):
+	global SFX
+	if SFX:
+		s.play()
 
 MINI_WIDTH = WIDTH/4
 MINI_HEIGHT = HEIGHT/4
 MINI_SCALE = 4
 BLIP_RADIUS = 2
+
 
 CLOCK = pygame.time.Clock()
 
@@ -89,7 +121,6 @@ def lerp_approach(current,target,rate,dt): # returns new target
 	diff =  (target-current)
 	log("diff_type",type(diff))
 	if type(diff) in [float,int]:
-		print(type(diff))
 		diff_mag = abs(diff)
 	else:
 		diff_mag = diff.length()
@@ -103,6 +134,10 @@ def set_max(v,maximum):
 		return v
 	return v.normalize()*min(l,maximum)
 
+def normalize_with_0(v):
+	if v.length() == 0:
+		return v
+	return v.normalize()
 
 def solve(L1,L2,P,O):
 	P = P-O

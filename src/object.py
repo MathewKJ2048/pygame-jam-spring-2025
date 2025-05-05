@@ -1,10 +1,20 @@
 from conf import *
+from particle import *
 
 class GameObject:
 	def __init__(self,parent=None):
 		self.r = Vector2(0,0)
 		self.set_parent(parent)
 		self.time = 0
+		self.last_emitted_particle_time = -10
+	def make_particles(self):
+		if self.time - self.last_emitted_particle_time > 0.01:
+			self.last_emitted_particle_time = self.time
+			return self.get_particles()
+	def get_particles(self):
+		return []# explosion(1,self.r,1,0.5,K3,0.1)
+	def get_final_particles(self):
+		return explosion(1000,self.r,5,2,K3-K3,0.1,darken(self.get_color(),0.1))
 	def evolve(self,dt):
 		self.time+=dt
 	def size(self):
@@ -38,14 +48,22 @@ class GameObject:
 
 class PlacedObject(GameObject):
 	MAX_HEALTH = 1
+	def __init__(self):
+		super().__init__()
+		self.health = type(self).MAX_HEALTH
+
 	def set_parent(self,parent):
 		if parent:
 			self.parent = parent
 			self.level = parent.level
-			self.health = type(self).MAX_HEALTH
 		else:
 			self.parent = None
 			self.level = 0
+
+	def cause_damage(self,amount):
+		self.health-=amount
+		if self.health<0:
+			self.health = 0
 
 class MovingObject(PlacedObject):
 	def __init__(self):

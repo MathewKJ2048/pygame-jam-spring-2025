@@ -88,6 +88,17 @@ def render_builder(surface,b,game):
 def render_ray(surface,c,game):
 	render_pair_list(surface,Vector3(*c.r,0),c.size(),game,GREEN,5,c.get_firing_lines())
 
+def render_particle(surface,p,game):
+	if abs(p.level - game.camera_level)>2:
+		return
+	R = p.get_radius()*(SUBDIVISION**game.camera_level)*CAMERA_CONSTANT_SCALE
+	particle_surface = pygame.Surface((2*R,2*R))
+	particle_surface.fill(BACKGROUND)
+	pygame.draw.circle(particle_surface,p.color,(R,R),R)
+	X, Y = project3(p.r,game)
+	surface.blit(particle_surface,(X-R,Y-R),special_flags=pygame.BLEND_RGB_ADD)
+	# pygame.draw.circle(surface,p.color,project3(p.r,game),p.radius*(SUBDIVISION**p.level)*CAMERA_CONSTANT_SCALE)
+
 
 def render_selection_plate(surface,b,game):
 	if not b.parent:
@@ -130,6 +141,9 @@ def get_minimap(game):
 def render(game):
 	surface = pygame.Surface((WIDTH,HEIGHT))
 	surface.fill(BACKGROUND)
+
+	for p in game.particles:
+		render_particle(surface,p,game)
 
 	def filter_list_objects(lobj):
 		filtered = []

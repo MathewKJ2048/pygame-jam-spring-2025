@@ -5,8 +5,9 @@ from bug import *
 class Cannon(PoweredObject):
 	RANGE = 5
 	FIRING_TIME = 4
-	DAMAGE_RATE = 1
+	DAMAGE_RATE = 1/2
 	MAX_WIDTH = 1/4
+	opening_time_fraction = 0.2
 	def __init__(self):
 		super().__init__()
 		self.aim_vector = I
@@ -15,14 +16,15 @@ class Cannon(PoweredObject):
 
 	def evolve(self,dt):
 		super().evolve(dt)
-		self.fire(dt)
+		self.fire()
+		self.burn_target(dt)
 	
 	def set_target(self,objects):
+		self.target = None
 		if self.stored == 0:
 			return
 		bugs = [b for b in objects if type(b) == Bug and (b.r-self.r).length()<type(self).RANGE and b.level == self.level]
 		if len(bugs) == 0:
-			self.target = None
 			return
 		bugs.sort(key=lambda o: -self.aim_vector.dot(set_max(o.r-self.r,1)))
 		self.target = bugs[0]
@@ -32,10 +34,25 @@ class Cannon(PoweredObject):
 	def get_color(self):
 		return PURPLE
 
-	def fire(self,dt):
+	def burn_target(self,dt):
+		# ablates target health if currently firing
+		if not self.target:
+			self.consumption_rate = 0
+			return
+		diff_time = self.time - self.last_fired_time
+		if not diff_time < type(self).FIRING_TIME:
+			self.consumption_rate = 0
+			return
+		th = type(self).opening_time_fraction*type(self).FIRING_TIME
+		if diff_time <= th and diff_time+dt>th:
+			play_sound(laser_sound)
+		self.consumption_rate = 8
+		damage = type(self).DAMAGE_RATE*dt
+		self.target.cause_damage(damage)
+
+	def fire(self): # resets the fire time if not currently firing, and nothing else
 		if not self.target:
 			return False
-		self.target.health -= type(self).DAMAGE_RATE*dt
 		if self.time - self.last_fired_time < type(self).FIRING_TIME:
 			return False
 		self.last_fired_time = self.time
@@ -43,13 +60,14 @@ class Cannon(PoweredObject):
 
 	def get_firing_lines(self):
 		f = self.get_f()
-		if f == 1 or not self.target:
-			return []
-		opening_time_fraction = 0.2
 		k = self.get_k()
+		if f == 1:
+			return []
+
 		answer = []
-		if k == 1:
-			d = self.target.r-self.r
+
+		if k == 1 and self.target:
+			d = (self.target.r-self.r)/self.size()
 			answer.append((K3/2,Vector3(d.x,d.y,1/2)))
 
 		av, p1, p2 = self.get_av_p1_p2()
@@ -84,12 +102,10 @@ class Cannon(PoweredObject):
 		return min((self.time-self.last_fired_time)/type(self).FIRING_TIME,1)
 	
 	def get_k(self): # ranges from 0 to 1 with a plateau at t
-		opening_time_fraction = 0.2
 		f = self.get_f()
-		return min(f,1-f,opening_time_fraction)/opening_time_fraction
+		return min(f,1-f,type(self).opening_time_fraction)/type(self).opening_time_fraction
 
 	def get_lines(self):
-		opening_time_fraction = 0.2
 		
 		n = 6
 		m = 2*n
