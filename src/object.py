@@ -9,6 +9,8 @@ class GameObject:
 		self.time+=dt
 	def size(self):
 		return SUBDIVISION**(-self.level)
+	def get_render_size(self):
+		return self.size()
 	def set_parent(self,parent):
 		if parent:
 			self.parent = parent
@@ -35,13 +37,26 @@ class GameObject:
 		return [process(pp) for pp in l]
 
 class PlacedObject(GameObject):
+	MAX_HEALTH = 1
 	def set_parent(self,parent):
 		if parent:
 			self.parent = parent
 			self.level = parent.level
+			self.health = type(self).MAX_HEALTH
 		else:
 			self.parent = None
 			self.level = 0
+
+class MovingObject(PlacedObject):
+	def __init__(self):
+		super().__init__()
+		self.render_level = self.level
+	def evolve(self,dt):
+		super().evolve(dt)
+		self.render_level = lerp_approach(self.render_level,self.level,1,dt)
+	def get_render_size(self):
+		return SUBDIVISION**(-self.render_level)
+	
 
 class Network:
 	def __init__(self):

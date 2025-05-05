@@ -76,11 +76,14 @@ class Game:
 
 		bugs = [b for b in self.objects if isinstance(b,Bug)]
 		warpers = [w for w in self.objects if isinstance(w,Warper)]
+		cannons = [c for c in self.objects if isinstance(c,Cannon)]
 
 		for b in bugs:
 			self.update_position(b)
 			b.set_target(self.objects,backup_target=self.builder)
 			self.remove_bug_objects(b)
+		for c in cannons:
+			c.set_target(self.objects)
 		for w in warpers:
 			self.operate_warper(w)
 

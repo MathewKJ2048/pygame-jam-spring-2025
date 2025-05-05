@@ -6,7 +6,7 @@ from engine import *
 
 
 
-class Bug(PlacedObject):
+class Bug(MovingObject):
 	UID = 0
 	def __init__(self):
 		super().__init__()
@@ -17,6 +17,7 @@ class Bug(PlacedObject):
 		self.time = 0
 		self.target = None
 		self.color = (200,100,0)
+		self.health = 1
 		self.compute_geometry()
 		
 	
@@ -58,7 +59,7 @@ class Bug(PlacedObject):
 			self.target = target_object_list[0]
 
 		THRESHHOLD = 1
-		bugs_swarm = [b for b in object_list if type(b)==Bug and (b.r-self.r).length()<=1 and b!=self]
+		bugs_swarm = [b for b in object_list if type(b)==Bug and (b.r-self.r).length()<=1 and b!=self and b.level == self.level]
 		direction = self.target.r - self.r
 		submissive = any([b.UID > self.UID for b in bugs_swarm]) # in presence of later bugs
 		diff_r = Vector2(0,0)

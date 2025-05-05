@@ -57,17 +57,21 @@ def project3(r_,game):
 	v = r.x*I_transform + r.y*J_transform + r.z*K_transform
 	return project(v,game)
 
-def render_object(surface,o,game):
-	r0 = Vector3(o.r.x,o.r.y,0)
-	pairs = o.get_animated_lines()
+def render_pair_list(surface,r0,size,game,color, width, pairs):
 	def transform(r):
-		return project3(r0 + r*o.size(),game)
+		return project3(r0 + r*size,game)
 	def transform_pair(p):
 		u, v = p
 		return (transform(u),transform(v))
 	point_pairs = [transform_pair(l) for l in pairs]
 	for pp in point_pairs:
-		draw_line(surface,pp,o.get_color(),o.get_width())
+		draw_line(surface,pp,color,width)
+
+def render_object(surface,o,game):
+	r0 = Vector3(o.r.x,o.r.y,0)
+	render_pair_list(surface,r0,o.get_render_size(),game,o.get_color(),o.get_width(),o.get_animated_lines())
+	
+	
 		
 
 def render_space_base(surface,s,game):
@@ -80,6 +84,10 @@ def render_builder(surface,b,game):
 	game.builder.level = game.camera_level
 	render_object(surface, game.builder, game)
 	game.builder.level = temp
+
+def render_ray(surface,c,game):
+	render_pair_list(surface,Vector3(*c.r,0),c.size(),game,GREEN,5,c.get_firing_lines())
+
 
 def render_selection_plate(surface,b,game):
 	if not b.parent:
@@ -148,6 +156,8 @@ def render(game):
 		render_object(surface,s,game)
 	for o in objects:
 		render_object(surface, o, game)
+		if type(o) == Cannon:
+			render_ray(surface, o, game)
 	render_selection_plate(surface,game.builder,game)
 	render_wires(surface,game.objects,game)
 	render_builder(surface, game.builder, game)
