@@ -115,7 +115,7 @@ def render_wires(surface,object_list,game):
 			if p.is_free():
 				continue
 			pp = (project3(p.get_r(),game),project3(p.connection.get_r(),game))
-			draw_line(surface,pp,YELLOW,2)
+			draw_line(surface,pp,YELLOW,5)
 
 def get_minimap(game):
 	def mini_project(r):
