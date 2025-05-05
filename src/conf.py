@@ -39,6 +39,8 @@ warp_sound = pygame.mixer.Sound('./assets/warp.wav')
 construction_sound = pygame.mixer.Sound("./assets/construction.wav")
 destruction_sound = pygame.mixer.Sound("./assets/destruction.wav")
 laser_sound = pygame.mixer.Sound("./assets/laser.wav")
+laser_sound.set_volume(0.2)
+destruction_sound.set_volume(0.5)
 
 def play_sound(s):
 	global SFX

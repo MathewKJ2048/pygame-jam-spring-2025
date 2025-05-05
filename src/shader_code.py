@@ -28,6 +28,15 @@ uniform float weight[5] = float[](0.227027, 0.1945946, 0.1216216, 0.054054, 0.01
 in vec2 uvs;
 out vec4 fragColor;
 
+float color_deviation(vec3 color)
+{
+	float m = (color.r+color.g+color.b)/3.0;
+	float diff_r = m-color.r;
+	float diff_g = m-color.g;
+	float diff_b = m-color.b;
+	float v = (diff_r*diff_r+diff_g*diff_g+diff_b*diff_b)/3;
+	return v;
+}
 
 void main() {
 

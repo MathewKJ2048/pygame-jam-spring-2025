@@ -151,7 +151,7 @@ def nimble():
 	b.color = ()
 	b.health = Bug.MAX_HEALTH/2
 	b.speed = 2
-	b.color = (220,120,150)
+	b.color = (250,100,150)
 	return b
 
 def normal():

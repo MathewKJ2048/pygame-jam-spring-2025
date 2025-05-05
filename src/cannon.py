@@ -13,6 +13,7 @@ class Cannon(PoweredObject):
 		self.aim_vector = I
 		self.target = None
 		self.last_fired_time = -100
+		self.PORTS = [Port(self,K3-K3)]
 
 	def evolve(self,dt):
 		super().evolve(dt)
@@ -57,6 +58,12 @@ class Cannon(PoweredObject):
 			return False
 		self.last_fired_time = self.time
 		return True
+
+	def get_particles():
+		k == self.get_k()
+		if self.target and k==1:
+			return explosion(10,self.target.r,5,2,K3-K3,0.2,darken(GREEN,0.1))
+
 
 	def get_firing_lines(self):
 		f = self.get_f()

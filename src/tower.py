@@ -10,6 +10,10 @@ class Tower(PoweredObject):
 		base = [unit_vector3(i*2*math.pi/n) for i in range(n)]
 		tower_arm_tips = [b/4+3*K3/4 for b in base]
 		self.PORTS = [Port(self,t) for t in tower_arm_tips]
+
+	def get_color(self):
+		return (100,100,100)
+	
 	def get_lines(self):
 		tower_base = K3/8
 		tower_top = K3/2
