@@ -33,7 +33,8 @@ def toggle_SFX():
 	SFX = not SFX
 
 pygame.mixer.music.load("./assets/game_jam_music.wav")
-pygame.mixer.music.play()
+def play_music():
+	pygame.mixer.music.play(-1)
 
 warp_sound = pygame.mixer.Sound('./assets/warp.wav')
 construction_sound = pygame.mixer.Sound("./assets/construction.wav")
@@ -46,6 +47,7 @@ def play_sound(s):
 	global SFX
 	if SFX:
 		s.play()
+
 
 MINI_WIDTH = WIDTH/4
 MINI_HEIGHT = HEIGHT/4
@@ -106,6 +108,11 @@ def unit_vector(theta):
 
 def unit_vector3(theta):
 	return math.cos(theta)*I3 + math.sin(theta)*J3
+
+
+I_transform = unit_vector(math.pi/6)
+J_transform = unit_vector(5*math.pi/6)
+K_transform = unit_vector(math.pi/2)
 
 def make_pair_list(base_list):
 	return [(base_list[i],base_list[(i+1)%len(base_list)]) for i in range(len(base_list))]

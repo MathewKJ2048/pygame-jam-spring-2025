@@ -50,9 +50,6 @@ def project(r,game):
 def project3(r_,game):
 	r = r_ - Vector3(*game.camera,0)
 	r = rotate_xy(r,game.camera_angle)
-	I_transform = unit_vector(math.pi/6)
-	J_transform = unit_vector(5*math.pi/6)
-	K_transform = unit_vector(math.pi/2)
 	v = r.x*I_transform + r.y*J_transform + r.z*K_transform
 	return project(v,game)
 
