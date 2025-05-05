@@ -62,7 +62,7 @@ class Cannon(PoweredObject):
 	def get_particles(self):
 		k = self.get_k()
 		if self.target and k==1:
-			return explosion(10,self.target.r,5,2,K3-K3,0.2,darken(GREEN,0.1))
+			return explosion(self.get_render_size(),10,Vector3(*self.target.r,1/2),5,2,K3-K3,0.2,darken(GREEN,0.1))
 		return []
 
 

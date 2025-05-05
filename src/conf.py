@@ -52,7 +52,9 @@ def play_sound(s):
 MINI_WIDTH = WIDTH/4
 MINI_HEIGHT = HEIGHT/4
 MINI_SCALE = 4
-BLIP_RADIUS = 2
+BLIP_RADIUS = 3
+
+DIFFICULTY = 0.1 # range from 0 to infinity - 0 has no bugs
 
 
 CLOCK = pygame.time.Clock()

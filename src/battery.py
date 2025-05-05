@@ -5,6 +5,9 @@ class Battery(PoweredObject):
 	CAPACITY = 10
 	def get_color(self):
 		return GREEN
+	def __init__(self):
+		super().__init__()
+		self.PORTS = [Port(self,K3/2)]
 	def get_lines(self):
 		n = 4
 		height = 1

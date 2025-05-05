@@ -12,5 +12,5 @@ class Builder(MovingObject):
 		L2 = [b/4 + K3 + K3/4 for b in BASE]
 		return make_pair_list(L1)+make_pair_list(L2)+interweave(L1,L2)
 	def get_particles(self):
-		return explosion(1,Vector3(*self.r,1),1,0,-2*K3,0.1,darken(YELLOW,0.1))
+		return explosion(self.get_render_size(),1,Vector3(*self.r,1),1,0,-2*K3,0.1,darken(YELLOW,0.1))
 

@@ -14,7 +14,7 @@ class GameObject:
 	def get_particles(self):
 		return []# explosion(1,self.r,1,0.5,K3,0.1)
 	def get_final_particles(self):
-		return explosion(1000,self.r,5,2,K3-K3,0.1,darken(self.get_color(),0.1))
+		return explosion(self.get_render_size(),1000,Vector3(*self.r,1/2),5,2,K3-K3,0.1,darken(self.get_color(),0.1))
 	def evolve(self,dt):
 		self.time+=dt
 	def size(self):

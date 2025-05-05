@@ -60,7 +60,7 @@ Controls can be configured by changing `./src/controls.py`
 - Cannons shoot any bug within range and at the same spatial scale as them. They do not target bugs in space warped relative to their space, so place cannons at all scales for an effective defense.
 - Cannons draw a lot of power when firing. Place batteries to provide reserve stores for the cannons to draw on in case the engines get destroyed.
 - If a warper loses power, all the elements within it are destroyed. This results in a rapid decay in power output if you rely on engines inside a warper for your power. Keep an eye on your power generation.
-- Controls can be edited 
+- Placing more engines attracts more bugs, which call for more cannons for defense, which requires more engines to power, and so on. More engines require more space, which must either be defended using cannons or placed in a defended area using a warper, which in turn requires more engines to power. It's a fine balancing game.
 
 ## Screenshots:
 
@@ -74,4 +74,3 @@ Controls can be configured by changing `./src/controls.py`
 
 - [LMMS](https://lmms.io/) and [SFXR](https://www.drpetter.se/project_sfxr.html), for music and SFX
 - [DaFluffyPotato](https://dafluffypotato.itch.io/) for their [excellent explanation](https://www.youtube.com/watch?v=LFbePt8i0DI) of incorporating shaders in pygame
-- 

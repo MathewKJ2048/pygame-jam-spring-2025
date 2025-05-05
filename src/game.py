@@ -134,6 +134,8 @@ class Game:
 
 		self.remove_unhealthy_objects()
 
+		self.place_enemies()
+
 		self.evolve_camera(dt)
 		self.generate_log()
 
@@ -359,6 +361,34 @@ class Game:
 		self.place_powered_object(Cannon())
 	def place_warper(self):
 		self.place_powered_object(Warper())
+
+	def get_base_c_R(self):
+		powered = [o for o in self.objects if isinstance(o,PoweredObject)]
+		for o in powered:
+			assert type(o.r)==Vector2
+		c = Vector2(0,0)
+		for o in powered:
+			c+=o.r
+		if len(powered)==0:
+			c = 0
+			R = 0
+		else:
+			c/=len(powered)
+			R = max([(c-o.r).length() for o in powered])
+		# c = sum([o.r for o in powered])/len(powered)
+		
+		return c, R
+
+	def place_enemies(self):
+		num_bugs = len([o for o in self.objects if isinstance(o,Bug)])
+		num_engines = len([o for o in self.objects if isinstance(o,Engine)])
+		to_place = max(int(num_engines*DIFFICULTY - num_bugs),0)
+		c, R = self.get_base_c_R()
+		R = max(R,5)
+		for i in range(to_place):
+			b = random.choice([nimble,normal,tank])()
+			b.r = c + (R+5)*unit_vector(math.pi*2*random.random())
+			self.objects.append(b)
 
 
 

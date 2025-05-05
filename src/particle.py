@@ -23,11 +23,13 @@ class Particle:
 		f = min(1,self.time/self.max_time)
 		return (1-f)*self.radius
 
-def explosion(number,r,max_v,min_v,bias_v,radius,color):
+def explosion(size,number,r,max_v,min_v,bias_v,radius,color):
 	sqrt3 = math.sqrt(3)
+	r = Vector3(r.x,r.y,r.z*size)
+	bias_v*=size
 	particles = []
 	def rand_v():
-		return (max_v+random.random()*(max_v-min_v))
+		return (max_v+random.random()*(max_v-min_v))*size
 	for i in range(number):
 		p = Particle(r,shift = 1/2)
 		p.color = color

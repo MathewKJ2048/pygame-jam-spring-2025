@@ -91,7 +91,7 @@ def render_ray(surface,c,game):
 def render_particle(surface,p,game):
 	if abs(p.level - game.camera_level)>2:
 		return
-	R = p.get_radius()*(SUBDIVISION**game.camera_level)*CAMERA_CONSTANT_SCALE
+	R = p.get_radius()*CAMERA_CONSTANT_SCALE
 	particle_surface = pygame.Surface((2*R,2*R))
 	particle_surface.fill(BACKGROUND)
 	pygame.draw.circle(particle_surface,p.color,(R,R),R)
@@ -127,7 +127,7 @@ def get_minimap(game):
 	pygame.draw.circle(surface,game.builder.get_color(),mini_project(game.builder.r),2)
 	mini_objects = [o for o in game.objects if o.level<=game.builder.level ]
 	for o in mini_objects:
-		if type(o) != Bug and type(o) not in [Tower, HighTower]:
+		if type(o) != Bug and type(o) in [Cannon, Warper]:
 			pygame.draw.circle(surface,o.get_color(),mini_project(o.r),BLIP_RADIUS)
 	for o in mini_objects:
 		if isinstance(o,PoweredObject):
