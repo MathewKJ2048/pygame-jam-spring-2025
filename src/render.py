@@ -117,6 +117,28 @@ def render_wires(surface,object_list,game):
 			pp = (project3(p.get_r(),game),project3(p.connection.get_r(),game))
 			draw_line(surface,pp,YELLOW,5)
 
+def get_energy_bar(game):
+	W = MINI_WIDTH
+	H = MINI_HEIGHT/20
+	bar_surface = pygame.Surface((W,H))
+	production = 0.001
+	consumption = 0.001
+	for n in game.networks:
+		production+=n.get_total_production_rate()
+		consumption+=n.get_total_consumption_rate()
+	pf = production/(production+consumption)
+	cf = consumption/(production+consumption)
+	mid_up = (pf*W,0)
+	mid_down = (pf*W,H)
+	left_up = (0,0)
+	left_down = (0,H)
+	right_up = (W,0)
+	right_down = (W,H)
+	pygame.draw.polygon(bar_surface,(20,250,20),[left_up,left_down,mid_down,mid_up],width=0)
+	pygame.draw.polygon(bar_surface,(250,20,20),[right_up,right_down,mid_down,mid_up],width=0)
+	return bar_surface
+
+
 def get_minimap(game):
 	def mini_project(r):
 		t = r - game.camera
@@ -177,6 +199,18 @@ def render(game):
 	render_builder(surface, game.builder, game)
 
 	if game.minimap:
-		surface.blit(get_minimap(game),(0,0))
+	
+		OFF_X = WIDTH/100
+		OFF_Y = HEIGHT/100
+		OFF = min(OFF_X,OFF_Y)
+		
+		surface.blit(get_minimap(game),(OFF,OFF))
+		surface.blit(get_energy_bar(game),(OFF,OFF))
+		pygame.draw.polygon(surface,MAGENTA,
+		[(OFF,OFF),
+		(OFF+MINI_WIDTH,OFF),
+		(OFF+MINI_WIDTH,OFF+MINI_HEIGHT),
+		(OFF,OFF+MINI_HEIGHT)
+		],width=2)
 
 	return surface

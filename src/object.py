@@ -85,7 +85,13 @@ class Network:
 		return sum([o.stored for o in self.objects])
 		
 	def get_net_rate(self):
-		return sum([o.production_rate-o.consumption_rate for o in self.objects])
+		return self.get_total_production_rate() - self.get_total_consumption_rate()
+
+	def get_total_production_rate(self):
+		return sum([o.production_rate for o in self.objects])
+
+	def get_total_consumption_rate(self):
+		return sum([o.consumption_rate for o in self.objects])
 		
 	def contains(self,o):
 		return o in self.objects

@@ -1,3 +1,12 @@
+DIFFICULTY = 0.2 # range from 0 to infinity - 0 has no bugs
+NAME = "Grid Surge"
+WIDTH = 1200
+HEIGHT = 800
+MINI_WIDTH = WIDTH/4
+MINI_HEIGHT = HEIGHT/4
+MINI_SCALE = 4
+BLIP_RADIUS = 3
+
 import time
 import pygame
 from pygame import Vector2
@@ -7,9 +16,8 @@ import random
 import os
 from colors import *
 
-NAME = "Grid Surge"
-WIDTH = 1200
-HEIGHT = 800
+
+
 
 pygame.mixer.pre_init(44100,-16,2,512)
 pygame.init()
@@ -49,12 +57,7 @@ def play_sound(s):
 		s.play()
 
 
-MINI_WIDTH = WIDTH/4
-MINI_HEIGHT = HEIGHT/4
-MINI_SCALE = 4
-BLIP_RADIUS = 3
 
-DIFFICULTY = 0.1 # range from 0 to infinity - 0 has no bugs
 
 
 CLOCK = pygame.time.Clock()

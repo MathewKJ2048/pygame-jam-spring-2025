@@ -55,6 +55,7 @@ Controls can be configured by changing `./src/controls.py`
 ## Tips:
 
 - The selected square is outlined in white. Construction or destruction affects the elemnt placed in that square.
+- The bar in the minimap shows the rates of net energy production (green) and consuption (red). If there's more red than green, build more engines!
 - The size of the yellow box under the element determines the amount of energy stored by the element.
 - Bugs come in three forms - quick, normal and armored.
 - Cannons shoot any bug within range and at the same spatial scale as them. They do not target bugs in space warped relative to their space, so place cannons at all scales for an effective defense.
