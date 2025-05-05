@@ -1,14 +1,10 @@
 from conf import *
 from object import *
 
-class Builder(PlacedObject):
+class Builder(MovingObject):
 	def __init__(self):
 		super().__init__()
 		self.v = Vector2(0,0)
-		self.time = 0
-	def evolve(self,dt):
-		super().evolve(dt)
-		self.r+=self.v*self.size()*dt
 	def get_lines(self):
 		n = 8
 		BASE = [unit_vector3(t*math.pi*2/n+BUILDER_ANGULAR_VELOCITY*self.time) for t in range(n)]

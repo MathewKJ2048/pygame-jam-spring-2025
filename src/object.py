@@ -51,8 +51,10 @@ class MovingObject(PlacedObject):
 	def __init__(self):
 		super().__init__()
 		self.render_level = self.level
+		self.v = I
 	def evolve(self,dt):
 		super().evolve(dt)
+		self.r+=self.v*self.size()*dt
 		self.render_level = lerp_approach(self.render_level,self.level,1,dt)
 	def get_render_size(self):
 		return SUBDIVISION**(-self.render_level)

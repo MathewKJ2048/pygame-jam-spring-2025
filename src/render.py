@@ -80,10 +80,10 @@ def render_space_base(surface,s,game):
 
 
 def render_builder(surface,b,game):
-	temp = game.builder.level
-	game.builder.level = game.camera_level
+	# temp = game.builder.level
+	# game.builder.level = game.camera_level
 	render_object(surface, game.builder, game)
-	game.builder.level = temp
+	# game.builder.level = temp
 
 def render_ray(surface,c,game):
 	render_pair_list(surface,Vector3(*c.r,0),c.size(),game,GREEN,5,c.get_firing_lines())

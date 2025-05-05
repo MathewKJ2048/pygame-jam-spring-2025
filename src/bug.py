@@ -37,7 +37,6 @@ class Bug(MovingObject):
 		
 	def evolve(self,dt):
 		super().evolve(dt)
-		self.r = self.r+self.v*dt*self.size()
 		self.legs_slide_back(dt)
 		self.update_target_leg_positions()
 		self.steps(dt)

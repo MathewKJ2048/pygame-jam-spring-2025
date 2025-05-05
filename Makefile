@@ -3,7 +3,8 @@ VENV = .venv
 PYTHON = $(VENV)/bin/python
 PIP = $(VENV)/bin/pip
 SRC = ./src/main.py
-EXE_NAME = main
+EXE_NAME = "Grid Surge"
+ICON = ./assets/icon.ico
 
 # Default target
 .DEFAULT_GOAL := help
@@ -34,7 +35,7 @@ run: $(VENV)/bin/python
 # Build executable (ensure venv exists and use its PyInstaller)
 build: $(VENV)/bin/python
 	@echo "Building executable..."
-	$(VENV)/bin/pyinstaller --onefile --name $(EXE_NAME) $(SRC)
+	$(VENV)/bin/pyinstaller --onefile --icon $(ICON) --name $(EXE_NAME) $(SRC)
 	@echo "Executable created in dist/"
 
 # Rule to ensure venv exists (shared dependency for run/build)
