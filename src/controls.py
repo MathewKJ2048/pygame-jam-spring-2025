@@ -24,7 +24,7 @@ def process_keydown_event(event,game):
 	
 	if event.key == pygame.K_s:
 		game.expand()
-	if event.key == pygame.K_b:
+	if event.key == pygame.K_v:
 		game.place_bug()
 	if event.key == pygame.K_e:
 		game.place_engine()
@@ -32,7 +32,7 @@ def process_keydown_event(event,game):
 		game.place_tower()
 	if event.key == pygame.K_h:
 		game.place_high_tower()
-	if event.key == pygame.K_v:
+	if event.key == pygame.K_b:
 		game.place_battery()
 	if event.key == pygame.K_w:
 		game.place_warper()

@@ -43,6 +43,7 @@ def toggle_SFX():
 pygame.mixer.music.load("./assets/game_jam_music.wav")
 def play_music():
 	pygame.mixer.music.play(-1)
+play_music()
 
 warp_sound = pygame.mixer.Sound('./assets/warp.wav')
 construction_sound = pygame.mixer.Sound("./assets/construction.wav")
