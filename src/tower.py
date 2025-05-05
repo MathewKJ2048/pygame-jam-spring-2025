@@ -9,7 +9,7 @@ class Tower(PoweredObject):
 		n = Tower.PORT_NUM
 		base = [unit_vector3(i*2*math.pi/n) for i in range(n)]
 		tower_arm_tips = [b/4+3*K3/4 for b in base]
-		self.PORTS = [Port(self,t) for t in tower_arm_tips]
+		self.PORTS = [Port(self,K3) for t in tower_arm_tips]
 
 	def get_color(self):
 		return (100,100,100)
@@ -26,7 +26,7 @@ class Tower(PoweredObject):
 
 		tower_arm_tips = [b/4+3*K3/4 for b in base]
 		tower = [(tower_base,tower_top)]+join(tower_arm_tips,tower_top)
-		return pedestal+tower
+		return pedestal+join(pedestal_high,K3)#tower
 		pass
 
 class HighTower(PoweredObject):

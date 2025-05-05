@@ -2,11 +2,12 @@ from conf import *
 from object import *
 
 class Engine(SingleSourcePoweredObject):
+	CAPACITY = 0
 	def __init__(self):
 		super().__init__()
 		self.production_rate=1
 	def get_color(self):
-		return YELLOW
+		return RED
 	def get_width(self):
 		return 2
 	def get_lines(self):

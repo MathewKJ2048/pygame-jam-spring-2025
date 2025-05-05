@@ -166,5 +166,5 @@ def tank():
 	b = Bug(N=8)
 	b.health = Bug.MAX_HEALTH*2
 	b.speed = 0.5
-	b.color = (220,20,60)
+	b.color = RED
 	return b

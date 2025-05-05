@@ -49,10 +49,9 @@ def project(r,game):
 
 def project3(r_,game):
 	r = r_ - Vector3(*game.camera,0)
-	theta = game.camera_angle
-	phi = theta+2*math.pi/3
-	I_transform = unit_vector(theta)
-	J_transform = unit_vector(phi)
+	r = rotate_xy(r,game.camera_angle)
+	I_transform = unit_vector(math.pi/6)
+	J_transform = unit_vector(5*math.pi/6)
 	K_transform = unit_vector(math.pi/2)
 	v = r.x*I_transform + r.y*J_transform + r.z*K_transform
 	return project(v,game)
@@ -70,7 +69,11 @@ def render_pair_list(surface,r0,size,game,color, width, pairs):
 def render_object(surface,o,game):
 	r0 = Vector3(o.r.x,o.r.y,0)
 	render_pair_list(surface,r0,o.get_render_size(),game,o.get_color(),o.get_width(),o.get_animated_lines())
-	
+	if isinstance(o,PoweredObject):
+		if type(o).CAPACITY!=0:
+			f = o.stored/type(o).CAPACITY
+			render_pair_list(surface,r0,o.get_render_size(),game,YELLOW,2,
+			make_pair_list([f*t/2 for t in [I3+J3,I3-J3,-J3-I3,J3-I3]]))
 	
 		
 
@@ -176,6 +179,7 @@ def render(game):
 	render_wires(surface,game.objects,game)
 	render_builder(surface, game.builder, game)
 
-	surface.blit(get_minimap(game),(0,0))
+	if game.minimap:
+		surface.blit(get_minimap(game),(0,0))
 
 	return surface

@@ -150,10 +150,6 @@ class PoweredObject(PlacedObject):
 		self.stored += energy
 		self.stored = min(self.stored,type(self).CAPACITY)
 		self.stored = max(self.stored,0)
-
-	def get_animated_lines(self):
-		f = self.stored/type(self).CAPACITY
-		return super().get_animated_lines()+[(K3+I3*f/2,K3-I3*f/2)]
 	
 	def get_connected_objects(self):
 		return [p.connection.parent for p in self.get_connected_ports()]

@@ -22,8 +22,6 @@ class Cannon(PoweredObject):
 	
 	def set_target(self,objects):
 		self.target = None
-		if self.stored == 0:
-			return
 		bugs = [b for b in objects if type(b) == Bug and (b.r-self.r).length()<type(self).RANGE and b.level == self.level]
 		if len(bugs) == 0:
 			return
@@ -56,13 +54,16 @@ class Cannon(PoweredObject):
 			return False
 		if self.time - self.last_fired_time < type(self).FIRING_TIME:
 			return False
+		if self.stored != type(self).CAPACITY:
+			return False
 		self.last_fired_time = self.time
 		return True
 
-	def get_particles():
-		k == self.get_k()
+	def get_particles(self):
+		k = self.get_k()
 		if self.target and k==1:
 			return explosion(10,self.target.r,5,2,K3-K3,0.2,darken(GREEN,0.1))
+		return []
 
 
 	def get_firing_lines(self):

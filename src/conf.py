@@ -159,3 +159,10 @@ def solve(L1,L2,P,O):
 	answer = O+p*p_cap+h*h_cap
 	return answer
 
+def rotate_xy(v,angle):
+	l = Vector2(v.x,v.y).length()
+	if l == 0:
+		return v
+	t = math.atan2(v.y,v.x)
+	return unit_vector3(t+angle)*l + v.z*K3
+

@@ -17,12 +17,37 @@ class Game:
 		self.objects = []
 		self.running = True
 		self.camera = Vector2(0,0)
-		self.camera_angle = math.pi/6
+		self.camera_angle = 0
+		self.camera_omega = 0
 		self.camera_level = 0
 		self.builder = Builder()
 		self.particles = []
 		self.networks = []
 		self.particles = []
+		self.paused = False
+		self.minimap = True
+		self.init_state()
+
+	def init_state(self):
+		for i in range(-2,3):
+			for j in range(-2,3):
+				s = Space()
+				s.r = Vector2(i,j)
+				self.spaces.append(s)
+				if i == 0 and j == 0:
+					e = Engine()
+					e.r = s.r
+					self.objects.append(e)
+					s.children.append(e)
+					e.set_parent(s)
+				elif i == 1 and j == 0:
+					t = Tower()
+					t.r = s.r
+					self.objects.append(t)
+					s.children.append(t)
+					t.set_parent(s)
+					self.make_connection(t)
+
 	
 	def scale(self):
 		return SUBDIVISION**(self.camera_level)
@@ -34,6 +59,7 @@ class Game:
 		target = self.builder.level
 		self.camera_level = lerp_approach(self.camera_level,target,abs(self.camera_level-target),dt)
 		self.camera = self.builder.r.copy()
+		self.camera_angle+=self.camera_omega*dt
 
 	def generate_log(self):
 		num_types = {}
@@ -45,6 +71,7 @@ class Game:
 				num_types[key]=1
 		log("object-readout",str(num_types))
 		log("particles",len(self.particles))
+		log("minimap",self.minimap)
 
 	def update_position(self,o):
 		if o.parent:
@@ -75,6 +102,8 @@ class Game:
 					play_sound(destruction_sound)
 
 	def evolve(self,dt):
+		if self.paused:
+			return
 
 		self.builder.evolve(dt)
 		self.builder.set_parent(self.get_current_space(self.builder))
@@ -116,6 +145,7 @@ class Game:
 		print(self.objects)
 		for o in self.objects:
 			self.particles+=o.make_particles()
+		self.particles+=self.builder.make_particles()
 
 		for p in self.particles:
 			if p.time > p.max_time:
@@ -222,9 +252,10 @@ class Game:
 		space = self.get_current_space(self.builder)
 		if not space:
 			return False
-		if space.is_free():
+		possible = [t for t in space.get_placed_objects() if not isinstance(t,Bug)]
+		if len(possible)==0:
 			return False
-		self.remove_any_type_object( space.get_placed_objects()[0])
+		self.remove_any_type_object(possible[0])
 		return True
 
 		
@@ -332,6 +363,11 @@ class Game:
 def process_pressed_keys(game):
 	pressed_keys = pygame.key.get_pressed()
 	game.builder.v = Vector2(0,0)
+	game.camera_omega = 0
+	if pressed_keys[pygame.K_COMMA]:
+		game.camera_omega += 1
+	if pressed_keys[pygame.K_PERIOD]:
+		game.camera_omega -= 1
 	if pressed_keys[pygame.K_LEFT]:
 		game.builder.v+=-I
 	if pressed_keys[pygame.K_RIGHT]:
@@ -364,7 +400,7 @@ def process_keydown_event(event,game):
 		game.place_cannon()
 	if event.key == pygame.K_q:
 		game.remove_selected_object()
-	if event.key == pygame.K_m:
+	if event.key == pygame.K_z:
 		if get_MUSIC():
 			pygame.mixer.music.fadeout(1000)
 		else:
@@ -372,3 +408,8 @@ def process_keydown_event(event,game):
 		toggle_MUSIC()
 	if event.key == pygame.K_x:
 		toggle_SFX()
+	if event.key == pygame.K_p:
+		game.paused = not game.paused
+	if event.key == pygame.K_m:
+		game.minimap = not game.minimap
+	
